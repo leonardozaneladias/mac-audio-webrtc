@@ -122,8 +122,24 @@ app.get('/rootCA.pem', (req, res) => {
   res.sendFile(p);
 });
 
-// no-cache: o navegador revalida (via ETag) a cada carga, então pega a versão
-// nova assim que muda — evita ficar preso em HTML/JS/CSS antigo entre deploys.
+// Cache-busting automático: a cada início do processo (deploy), gera um BUILD
+// e injeta ?v=BUILD nas URLs de CSS/JS das páginas. Assim o navegador SEMPRE
+// busca a versão nova após um deploy (não fica preso em asset antigo em cache).
+const BUILD = String(Date.now());
+function servePage(name) {
+  return (req, res) => {
+    let html;
+    try { html = fs.readFileSync(path.join(__dirname, 'public', name), 'utf8'); }
+    catch { return res.status(404).send('not found'); }
+    html = html.replace(/(\/(?:style\.css|common\.js|listen\.js|broadcast\.js))"/g, `$1?v=${BUILD}"`);
+    res.set('Cache-Control', 'no-cache').type('html').send(html);
+  };
+}
+app.get(['/', '/index.html'], servePage('index.html'));
+app.get(['/listen', '/listen.html'], servePage('listen.html'));
+app.get(['/broadcast', '/broadcast.html'], servePage('broadcast.html'));
+
+// Demais estáticos (JS/CSS versionados, ícones, manifest, sw) com no-cache.
 app.use(express.static('public', {
   extensions: ['html'],
   etag: true,
