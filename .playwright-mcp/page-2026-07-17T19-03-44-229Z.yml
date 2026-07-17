@@ -1,0 +1,44 @@
+- generic [ref=e2]:
+  - link [ref=e4] [cursor=pointer]:
+    - /url: /login
+    - img "CloudPanel" [ref=e5]
+  - generic [ref=e8]:
+    - textbox "User Name" [ref=e11]
+    - textbox "Password" [ref=e14]
+    - button "Log In" [ref=e17] [cursor=pointer]
+  - generic [ref=e19]:
+    - generic [ref=e20]: "Language:"
+    - combobox "Language:" [ref=e22]:
+      - option "Arabic"
+      - option "Bosnian"
+      - option "Bulgarian"
+      - option "Chinese (Simplified)"
+      - option "Chinese (Taiwan)"
+      - option "Czech"
+      - option "English" [selected]
+      - option "Finnish"
+      - option "French"
+      - option "German"
+      - option "Danish"
+      - option "Dutch"
+      - option "Georgian"
+      - option "Greek"
+      - option "Hebrew"
+      - option "Hungarian"
+      - option "Korean"
+      - option "Lithuanian"
+      - option "Indonesian"
+      - option "Italian"
+      - option "Japanese"
+      - option "Spanish"
+      - option "Persian"
+      - option "Polish"
+      - option "Portuguese (Brasil)"
+      - option "Romanian"
+      - option "Russian"
+      - option "Slovak"
+      - option "Serbian"
+      - option "Thai"
+      - option "Turkish"
+      - option "Ukrainian"
+      - option "Vietnamese"

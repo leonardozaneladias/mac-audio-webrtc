@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transmissor · Mic do Mac</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: -apple-system, system-ui, sans-serif; max-width: 620px;
+           margin: 40px auto; padding: 0 20px; line-height: 1.5; }
+    h1 { font-size: 1.4rem; }
+    button { font-size: 1.1rem; padding: 12px 22px; border-radius: 12px;
+             border: none; background: #0a84ff; color: #fff; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: default; }
+    select { font-size: 1rem; padding: 10px 12px; border-radius: 10px; width: 100%;
+             margin-top: 6px; }
+    .row { margin-top: 18px; }
+    label { font-weight: 600; font-size: .95rem; }
+    .status { margin-top: 20px; padding: 14px 16px; border-radius: 12px;
+              background: rgba(127,127,127,.12); }
+    .dot { display:inline-block; width:10px; height:10px; border-radius:50%;
+           background:#888; margin-right:8px; vertical-align: middle; }
+    .on { background:#30d158; }
+    .paused { background:#ff9f0a; }
+    #pause { margin-top: 14px; background:#ff9f0a; }
+    #record { margin-top: 14px; margin-left: 10px; background:#ff375f; }
+    #record.recording { background:#8e8e93; }
+    .rec { display:inline-block; width:10px; height:10px; border-radius:50%;
+           background:#ff375f; margin-right:6px; vertical-align: middle;
+           animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: .25; } }
+    .recordings { margin-top: 22px; }
+    .recordings > label { font-weight: 600; font-size: .95rem; }
+    .recitem { padding: 12px; margin-top: 8px; border-radius: 10px;
+               background: rgba(127,127,127,.12); }
+    .recitem .meta { display:flex; justify-content: space-between; align-items:center;
+                     font-size: .85rem; margin-bottom: 8px; }
+    .recitem audio { width: 100%; }
+    .recitem a { text-decoration: none; font-weight: 600; }
+    meter { width: 100%; height: 16px; margin-top: 10px; }
+    small { opacity: .7; }
+    .hidden { display: none; }
+    .listeners { margin-top: 22px; }
+    .listeners > label { font-weight: 600; font-size: .95rem; }
+    .lrow { display:flex; align-items:center; gap: 10px; padding: 10px 12px;
+            margin-top: 8px; border-radius: 10px; background: rgba(127,127,127,.12); }
+    .lbadge { flex: 0 0 auto; padding: 4px 10px; border-radius: 999px;
+              font-size: .8rem; font-weight: 700; color:#fff; background:#888; }
+    .lname { flex: 0 0 auto; font-weight: 600; }
+    .lmetrics { flex: 1; text-align: right; font-size: .85rem; opacity: .85;
+                font-variant-numeric: tabular-nums; }
+    .lempty { margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>🎙️ Transmissor — microfone do Mac</h1>
+  <p>Clique para começar a capturar o microfone. Deixe esta aba aberta enquanto escuta no iPhone.</p>
+  <button id="start">Começar a transmitir</button>
+
+  <div class="row hidden" id="micRow">
+    <label for="mic">Microfone</label>
+    <select id="mic"></select>
+  </div>
+
+  <button id="pause" class="hidden">⏸️ Pausar transmissão</button>
+  <button id="record" class="hidden">⏺️ Gravar</button>
+  <div id="hint" class="hidden"><small>Atalho: barra de espaço ou P (pausar) · R (gravar)</small></div>
+
+  <div class="recordings hidden" id="recordingsBox">
+    <label>Gravações</label>
+    <div id="recList"></div>
+  </div>
+
+  <div class="status">
+    <div><span class="dot" id="dot"></span><span id="state">Parado</span></div>
+    <div id="count"><small>Nenhum ouvinte conectado</small></div>
+    <meter id="level" min="0" max="1" value="0"></meter>
+  </div>
+
+  <div class="listeners hidden" id="listenersBox">
+    <label>Qualidade por ouvinte</label>
+    <div id="listenerRows"></div>
+  </div>
+
+  <script>
+    let ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+    const TOKEN = new URLSearchParams(location.search).get('token') || '';
+    const Q = TOKEN ? '?token=' + encodeURIComponent(TOKEN) : '';
+
+    // Busca STUN/TURN do servidor (com as credenciais temporárias do TURN)
+    async function loadIce() {
+      try {
+        const r = await fetch('/ice' + Q);
+        if (r.ok) { const j = await r.json(); if (j.iceServers) ICE = j; }
+      } catch {}
+    }
+
+    const peers = new Map();      // listenerId -> RTCPeerConnection
+    let localStream = null;
+    let ws = null;
+    let paused = false;
+    let recorder = null, recChunks = [], recStart = 0;
+
+    // Medidor de nível (reutiliza um único AudioContext)
+    let meterCtx = null, meterSource = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    function connectWS() {
+      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+      ws = new WebSocket(`${proto}://${location.host}${Q}`);
+      ws.onopen = () => ws.send(JSON.stringify({ type: 'broadcaster' }));
+      ws.onmessage = async (e) => {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'new-listener') await makeOffer(msg.id);
+        else if (msg.type === 'answer') {
+          const pc = peers.get(msg.id);
+          if (pc) await pc.setRemoteDescription(msg.sdp);
+        } else if (msg.type === 'candidate') {
+          const pc = peers.get(msg.id);
+          if (pc && msg.candidate) await pc.addIceCandidate(msg.candidate).catch(()=>{});
+        } else if (msg.type === 'listener-left') {
+          const pc = peers.get(msg.id);
+          if (pc) pc.close();
+          peers.delete(msg.id);
+          updateCount();
+        }
+      };
+      ws.onclose = () => { $('state').textContent = 'Ponte caiu — recarregue a página'; };
+    }
+
+    // ---- Qualidade por ouvinte -------------------------------------------
+    function classify(rttMs, lossPct, jitterMs) {
+      if (rttMs == null) return ['Medindo…', '#888'];
+      if (rttMs < 80 && lossPct < 1 && jitterMs < 15) return ['Excelente', '#30d158'];
+      if (rttMs < 150 && lossPct < 3 && jitterMs < 30) return ['Boa', '#34c759'];
+      if (rttMs < 300 && lossPct < 8 && jitterMs < 60) return ['Instável', '#ff9f0a'];
+      return ['Ruim', '#ff375f'];
+    }
+
+    // Lê as estatísticas que o receptor reportou de volta (remote-inbound-rtp)
+    async function peerStats(pc) {
+      const stats = await pc.getStats().catch(() => null);
+      if (!stats) return {};
+      let rtt = null, jitter = null, lost = null, sent = null, rttPair = null, bestBytes = -1;
+      stats.forEach((r) => {
+        if (r.type === 'remote-inbound-rtp') {
+          if (typeof r.roundTripTime === 'number') rtt = r.roundTripTime;   // seg
+          if (typeof r.jitter === 'number') jitter = r.jitter;              // seg
+          if (typeof r.packetsLost === 'number') lost = r.packetsLost;
+        }
+        if (r.type === 'outbound-rtp' && (r.kind === 'audio' || r.mediaType === 'audio')) {
+          if (typeof r.packetsSent === 'number') sent = r.packetsSent;
+        }
+        if (r.type === 'candidate-pair' && r.state === 'succeeded') {
+          const b = r.bytesSent || 0;
+          if (b >= bestBytes && typeof r.currentRoundTripTime === 'number') {
+            bestBytes = b; rttPair = r.currentRoundTripTime;
+          }
+        }
+      });
+      if (rtt == null) rtt = rttPair;   // fallback: RTT do par ICE
+
+      // Perda no intervalo (delta), usando o estado anterior guardado no pc
+      let lossPct = 0;
+      if (lost != null && sent != null) {
+        const dLost = Math.max(0, lost - (pc._prevLost || 0));
+        const dSent = Math.max(0, sent - (pc._prevSent || 0));
+        if (pc._baseline && (dLost + dSent) > 0) lossPct = (dLost / (dLost + dSent)) * 100;
+        pc._prevLost = lost; pc._prevSent = sent; pc._baseline = true;
+      }
+
+      return {
+        rttMs: rtt != null ? Math.round(rtt * 1000) : null,
+        jitMs: jitter != null ? Math.round(jitter * 1000) : null,
+        lossPct: (lost != null) ? lossPct : null,
+      };
+    }
+
+    async function pollPeers() {
+      const box = $('listenersBox');
+      const rows = $('listenerRows');
+      if (peers.size === 0) {
+        box.classList.remove('hidden');
+        rows.innerHTML = '<div class="lempty"><small>Nenhum ouvinte conectado</small></div>';
+        return;
+      }
+      box.classList.remove('hidden');
+      const entries = [];
+      for (const [id, pc] of peers) entries.push([id, await peerStats(pc)]);
+
+      rows.innerHTML = entries.map(([id, m]) => {
+        const [label, color] = classify(m.rttMs, m.lossPct == null ? 0 : m.lossPct,
+                                        m.jitMs == null ? 0 : m.jitMs);
+        const rtt = m.rttMs != null ? `${m.rttMs} ms` : '—';
+        const loss = m.lossPct != null ? `${m.lossPct.toFixed(1)}%` : '—';
+        const jit = m.jitMs != null ? `${m.jitMs} ms` : '—';
+        return `<div class="lrow">
+          <span class="lbadge" style="background:${color}">${label}</span>
+          <span class="lname">Ouvinte ${id}</span>
+          <span class="lmetrics">RTT ${rtt} · perda ${loss} · jitter ${jit}</span>
+        </div>`;
+      }).join('');
+    }
+
+    async function makeOffer(id) {
+      const pc = new RTCPeerConnection(ICE);
+      peers.set(id, pc);
+      localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
+      pc.onicecandidate = (ev) => {
+        if (ev.candidate) ws.send(JSON.stringify({ type: 'candidate', id, candidate: ev.candidate }));
+      };
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      ws.send(JSON.stringify({ type: 'offer', id, sdp: pc.localDescription }));
+      updateCount();
+    }
+
+    function updateCount() {
+      const n = peers.size;
+      $('count').innerHTML = `<small>${n === 0 ? 'Nenhum ouvinte conectado'
+        : n + ' ouvinte(s) conectado(s)'}</small>`;
+    }
+
+    function attachMeter(stream) {
+      if (!meterCtx) {
+        meterCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = meterCtx.createAnalyser();
+        analyser.fftSize = 512;
+        meterCtx._analyser = analyser;
+        // Nó de destino fixo para gravação: a fonte (mic) se reconecta aqui a
+        // cada troca de microfone, então a gravação não é interrompida.
+        meterCtx._recDest = meterCtx.createMediaStreamDestination();
+        // Não conectar ao destination: o analyser lê o sinal sem tocar nos
+        // alto-falantes do Mac (evita microfonia/eco).
+        const buf = new Uint8Array(analyser.frequencyBinCount);
+        (function loop() {
+          analyser.getByteTimeDomainData(buf);
+          let sum = 0;
+          for (const v of buf) { const x = (v - 128) / 128; sum += x * x; }
+          $('level').value = Math.min(1, Math.sqrt(sum / buf.length) * 3);
+          requestAnimationFrame(loop);
+        })();
+      }
+      if (meterSource) { try { meterSource.disconnect(); } catch {} }
+      meterSource = meterCtx.createMediaStreamSource(stream);
+      meterSource.connect(meterCtx._analyser);
+      meterSource.connect(meterCtx._recDest);   // alimenta também a gravação
+    }
+
+    async function listMics(currentDeviceId) {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const mics = devices.filter((d) => d.kind === 'audioinput');
+      const sel = $('mic');
+      sel.innerHTML = '';
+      mics.forEach((d, i) => {
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || `Microfone ${i + 1}`;
+        sel.appendChild(opt);
+      });
+      if (currentDeviceId) sel.value = currentDeviceId;
+      $('micRow').classList.remove('hidden');
+    }
+
+    // Pausa/retoma desabilitando a faixa de áudio (mantém as conexões vivas)
+    function applyPause() {
+      if (localStream) localStream.getAudioTracks().forEach((t) => { t.enabled = !paused; });
+      $('pause').textContent = paused ? '▶︎ Retomar transmissão' : '⏸️ Pausar transmissão';
+      $('dot').classList.toggle('on', !paused);
+      $('dot').classList.toggle('paused', paused);
+      $('state').textContent = paused ? 'Pausado' : 'Transmitindo';
+    }
+
+    function togglePause() {
+      paused = !paused;
+      applyPause();
+    }
+
+    // ---- Gravação ---------------------------------------------------------
+    function pickMime() {
+      const opts = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/aac'];
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported) {
+        for (const t of opts) if (MediaRecorder.isTypeSupported(t)) return t;
+      }
+      return '';   // deixa o navegador escolher o padrão
+    }
+
+    function fmtDur(ms) {
+      const s = Math.round(ms / 1000);
+      return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    }
+
+    function startRecording() {
+      if (!meterCtx || !meterCtx._recDest) { alert('Comece a transmitir primeiro.'); return; }
+      const mime = pickMime();
+      try {
+        recorder = new MediaRecorder(meterCtx._recDest.stream, mime ? { mimeType: mime } : undefined);
+      } catch (err) {
+        alert('Gravação não suportada neste navegador: ' + err.message);
+        return;
+      }
+      recChunks = [];
+      recorder.ondataavailable = (e) => { if (e.data && e.data.size) recChunks.push(e.data); };
+      recorder.onstop = () => finalizeRecording(recorder.mimeType || mime);
+      recorder.start();
+      recStart = Date.now();
+      const btn = $('record');
+      btn.classList.add('recording');
+      btn.innerHTML = '<span class="rec"></span>Parar gravação';
+    }
+
+    function stopRecording() {
+      if (recorder && recorder.state !== 'inactive') recorder.stop();
+      recorder = null;
+      const btn = $('record');
+      btn.classList.remove('recording');
+      btn.textContent = '⏺️ Gravar';
+    }
+
+    function toggleRecording() {
+      if (recorder && recorder.state === 'recording') stopRecording();
+      else startRecording();
+    }
+
+    function finalizeRecording(mime) {
+      const type = (mime || '').split(';')[0] || 'audio/webm';
+      const ext = type.includes('mp4') || type.includes('aac') ? 'm4a' : 'webm';
+      const blob = new Blob(recChunks, { type });
+      const url = URL.createObjectURL(blob);
+      const dur = fmtDur(Date.now() - recStart);
+      const size = (blob.size / 1024 / 1024).toFixed(2);
+      const stamp = new Date().toLocaleString('pt-BR').replace(/[/:]/g, '-').replace(', ', '_');
+      const name = `gravacao-${stamp}.${ext}`;
+
+      $('recordingsBox').classList.remove('hidden');
+      const item = document.createElement('div');
+      item.className = 'recitem';
+      item.innerHTML =
+        `<div class="meta"><span>🎵 ${dur} · ${size} MB</span>` +
+        `<a href="${url}" download="${name}">⬇︎ Baixar</a></div>` +
+        `<audio controls src="${url}"></audio>`;
+      $('recList').prepend(item);
+    }
+
+    // Atalho de teclado: Espaço/P (pausar), R (gravar) — após iniciar; ignora campos
+    window.addEventListener('keydown', (e) => {
+      if ($('pause').classList.contains('hidden')) return;   // ainda não iniciou
+      const tag = (e.target.tagName || '').toUpperCase();
+      if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === ' ' || e.code === 'Space' || e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        togglePause();
+      } else if (e.key.toLowerCase() === 'r') {
+        e.preventDefault();
+        toggleRecording();
+      }
+    });
+
+    // Troca o microfone ao vivo, sem derrubar os ouvintes (replaceTrack)
+    async function switchMic(deviceId) {
+      let newStream;
+      try {
+        newStream = await navigator.mediaDevices.getUserMedia({
+          audio: { deviceId: { exact: deviceId },
+                   echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+          video: false
+        });
+      } catch (err) {
+        alert('Não consegui trocar de microfone: ' + err.message);
+        return;
+      }
+      const newTrack = newStream.getAudioTracks()[0];
+      newTrack.enabled = !paused;                 // preserva o estado de pausa
+      for (const pc of peers.values()) {
+        const sender = pc.getSenders().find((s) => s.track && s.track.kind === 'audio');
+        if (sender) await sender.replaceTrack(newTrack).catch(()=>{});
+      }
+      localStream.getTracks().forEach((t) => t.stop());
+      localStream = newStream;
+      attachMeter(localStream);
+    }
+
+    $('start').onclick = async () => {
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+          video: false
+        });
+      } catch (err) {
+        alert('Não consegui acessar o microfone: ' + err.message);
+        return;
+      }
+      $('start').disabled = true;
+      $('dot').classList.add('on');
+      $('state').textContent = 'Transmitindo';
+
+      await loadIce();                     // carrega STUN/TURN antes de conectar
+
+      const currentId = localStream.getAudioTracks()[0].getSettings().deviceId;
+      await listMics(currentId);           // rótulos só aparecem após a permissão
+      attachMeter(localStream);
+      connectWS();
+
+      $('pause').classList.remove('hidden');
+      $('record').classList.remove('hidden');
+      $('hint').classList.remove('hidden');
+      $('pause').onclick = togglePause;
+      $('record').onclick = toggleRecording;
+      $('mic').onchange = (e) => switchMic(e.target.value);
+      navigator.mediaDevices.ondevicechange = () =>
+        listMics($('mic').value).catch(()=>{});
+
+      setInterval(pollPeers, 1000);        // atualiza a qualidade por ouvinte
+    };
+  </script>
+</body>
+</html>
