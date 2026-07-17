@@ -1,8 +1,0 @@
-- main [ref=f97e2]:
-  - generic [ref=f97e3]:
-    - generic [ref=f97e4]: 🎙️
-    - generic [ref=f97e5]:
-      - heading "Transmitir" [level=1] [ref=f97e6]
-      - generic [ref=f97e7]: microfone do Mac → iPhone
-  - button "🎙️ Começar a transmitir" [active] [ref=f97e9] [cursor=pointer]
-  - generic [ref=f97e10]: "Atalhos: espaço/P pausar · R gravar. Deixe esta aba aberta enquanto escuta."

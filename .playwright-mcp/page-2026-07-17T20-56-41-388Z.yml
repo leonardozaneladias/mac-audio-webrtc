@@ -1,6 +1,0 @@
-- generic [ref=f96e3]:
-  - generic [ref=f96e4]: 🔒
-  - heading "Mac Audio" [level=1] [ref=f96e5]
-  - paragraph [ref=f96e6]: Digite a senha de acesso
-  - textbox "senha" [active] [ref=f96e7]
-  - button "Entrar" [ref=f96e8] [cursor=pointer]
