@@ -1,0 +1,10 @@
+- main [ref=f96e9]:
+  - generic [ref=f96e10]:
+    - generic [ref=f96e11]: 🎧
+    - generic [ref=f96e12]:
+      - heading "Escutar" [level=1] [ref=f96e13]
+      - generic [ref=f96e14]: áudio do Mac ao vivo
+  - generic [ref=f96e15]:
+    - button "▶︎ Escutar" [ref=f96e16] [cursor=pointer]
+    - generic [ref=f96e17]: Parado
+  - generic [ref=f96e21]: "Dica: no iPhone, toque em Compartilhar → “Adicionar à Tela de Início” para virar app."
