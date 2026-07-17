@@ -167,9 +167,17 @@
 
   // ---------- PWA ----------
   function registerSW() {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
-    }
+    if (!('serviceWorker' in navigator)) return;
+    window.addEventListener('load', () => {
+      const hadController = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      let refreshing = false;
+      // Quando uma versão nova assume, recarrega 1x (evita mistura de versões)
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing || !hadController) return;
+        refreshing = true; location.reload();
+      });
+    });
   }
 
   global.MA = {
