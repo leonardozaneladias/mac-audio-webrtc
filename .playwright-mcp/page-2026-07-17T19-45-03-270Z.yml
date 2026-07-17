@@ -1,0 +1,179 @@
+- generic [active] [ref=f8e1]:
+  - generic [ref=f8e3]:
+    - link "Do you like CloudPanel? Please write a short review to support us." [ref=f8e4] [cursor=pointer]:
+      - /url: https://g.page/mgtcommerce/review?rc
+    - button "Close" [ref=f8e5] [cursor=pointer]
+  - banner [ref=f8e6]:
+    - link [ref=f8e8] [cursor=pointer]:
+      - /url: /
+      - img "CloudPanel" [ref=f8e9]
+    - generic [ref=f8e10]:
+      - generic [ref=f8e11]:
+        - link "Dashboard" [ref=f8e12] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Sites" [ref=f8e13] [cursor=pointer]:
+          - /url: /
+      - list [ref=f8e15]:
+        - listitem [ref=f8e16]:
+          - link [ref=f8e17] [cursor=pointer]:
+            - /url: javascript:void(0);
+        - listitem [ref=f8e20]:
+          - link "Admin Area" [ref=f8e21] [cursor=pointer]:
+            - /url: /admin/users
+        - listitem [ref=f8e24]:
+          - button [ref=f8e25] [cursor=pointer]:
+            - img "Leonardo Dias" [ref=f8e26]
+  - main [ref=f8e27]:
+    - generic [ref=f8e30]:
+      - generic [ref=f8e31]:
+        - generic [ref=f8e32]:
+          - heading "Domain" [level=3] [ref=f8e33]
+          - link "rec.binarytech.com.br" [ref=f8e35] [cursor=pointer]:
+            - /url: https://rec.binarytech.com.br
+        - generic [ref=f8e38]:
+          - heading "Site User" [level=3] [ref=f8e39]
+          - link "rec" [ref=f8e41] [cursor=pointer]:
+            - /url: javascript:void(0);
+        - generic [ref=f8e42]:
+          - heading "IP Address" [level=3] [ref=f8e43]
+          - link "179.247.134.101" [ref=f8e45] [cursor=pointer]:
+            - /url: javascript:void(0);
+      - generic [ref=f8e46]:
+        - list [ref=f8e48]:
+          - listitem [ref=f8e49]:
+            - link "Settings" [ref=f8e50] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/settings
+          - listitem [ref=f8e51]:
+            - link "Vhost" [ref=f8e52] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/vhost
+          - listitem [ref=f8e53]:
+            - link "Databases" [ref=f8e54] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/databases
+          - listitem [ref=f8e55]:
+            - link "SSL/TLS" [ref=f8e56] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/certificates
+          - listitem [ref=f8e57]:
+            - link "Security" [ref=f8e58] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/security
+          - listitem [ref=f8e59]:
+            - link "SSH/FTP" [ref=f8e60] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/users
+          - listitem [ref=f8e61]:
+            - link "File Manager" [ref=f8e62] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/file-manager
+          - listitem [ref=f8e63]:
+            - link "Cron Jobs" [ref=f8e64] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/cron-jobs
+          - listitem [ref=f8e65]:
+            - link "Logs" [ref=f8e66] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/logs
+        - generic [ref=f8e67]:
+          - generic [ref=f8e68]:
+            - generic [ref=f8e69]: Domain Settings
+            - generic [ref=f8e72]:
+              - generic [ref=f8e73]:
+                - generic [ref=f8e74]:
+                  - generic [ref=f8e75]: Domain Name
+                  - textbox "Domain Name" [disabled] [ref=f8e76]: rec.binarytech.com.br
+                - generic [ref=f8e77]:
+                  - generic [ref=f8e78]: Root Directory *
+                  - textbox "Root Directory *" [ref=f8e79]: rec.binarytech.com.br
+                  - generic [ref=f8e80]: /home/rec/htdocs/rec.binarytech.com.br
+              - button "Save" [ref=f8e84] [cursor=pointer]
+          - generic [ref=f8e85]:
+            - generic [ref=f8e86]: Site User Settings
+            - generic [ref=f8e89]:
+              - generic [ref=f8e90]:
+                - generic [ref=f8e91]:
+                  - generic [ref=f8e92]: Site User
+                  - textbox "Site User" [disabled] [ref=f8e93]: rec
+                - generic [ref=f8e94]:
+                  - generic [ref=f8e95]: Password
+                  - textbox "Password" [ref=f8e96]:
+                    - /placeholder: "****************"
+                  - link "Generate new password" [ref=f8e97] [cursor=pointer]:
+                    - /url: javascript:void(0);
+              - generic [ref=f8e99]:
+                - generic [ref=f8e100]: SSH Keys
+                - textbox "SSH Keys" [ref=f8e101]
+              - button "Save" [ref=f8e104] [cursor=pointer]
+          - generic [ref=f8e105]:
+            - generic [ref=f8e106]: Node.js Settings
+            - generic [ref=f8e109]:
+              - generic [ref=f8e110]:
+                - generic [ref=f8e111]:
+                  - generic [ref=f8e112]: Node.js Version *
+                  - combobox "Node.js Version *" [ref=f8e113]:
+                    - option "Node 22 LTS" [selected]
+                    - option "Node 20 LTS"
+                    - option "Node 18 LTS"
+                    - option "Node 16 LTS"
+                    - option "Node 14 LTS"
+                    - option "Node 12 LTS"
+                - generic [ref=f8e114]:
+                  - generic [ref=f8e115]: App Port *
+                  - textbox "App Port *" [ref=f8e116]: "3000"
+              - button "Save" [ref=f8e119] [cursor=pointer]
+          - generic [ref=f8e120]:
+            - generic [ref=f8e121]: Delete Site
+            - generic [ref=f8e122]:
+              - paragraph [ref=f8e123]: Deleting a site will permanently remove all site files, databases, users, and configs, and they will be non-recoverable.
+              - link "Delete Site" [ref=f8e124] [cursor=pointer]:
+                - /url: javascript:void(0);
+  - contentinfo [ref=f8e125]:
+    - list [ref=f8e127]:
+      - listitem [ref=f8e128]:
+        - combobox [ref=f8e130]:
+          - option "Arabic"
+          - option "Bosnian"
+          - option "Bulgarian"
+          - option "Chinese (Simplified)"
+          - option "Chinese (Taiwan)"
+          - option "Czech"
+          - option "English" [selected]
+          - option "Finnish"
+          - option "French"
+          - option "German"
+          - option "Danish"
+          - option "Dutch"
+          - option "Georgian"
+          - option "Greek"
+          - option "Hebrew"
+          - option "Hungarian"
+          - option "Korean"
+          - option "Lithuanian"
+          - option "Indonesian"
+          - option "Italian"
+          - option "Japanese"
+          - option "Spanish"
+          - option "Persian"
+          - option "Polish"
+          - option "Portuguese (Brasil)"
+          - option "Romanian"
+          - option "Russian"
+          - option "Slovak"
+          - option "Serbian"
+          - option "Thai"
+          - option "Turkish"
+          - option "Ukrainian"
+          - option "Vietnamese"
+      - listitem [ref=f8e131]:
+        - link "Blog" [ref=f8e132] [cursor=pointer]:
+          - /url: https://www.cloudpanel.io/blog/
+        - text: "|"
+      - listitem [ref=f8e133]:
+        - link "Docs" [ref=f8e134] [cursor=pointer]:
+          - /url: https://www.cloudpanel.io/docs/v2/
+        - text: "|"
+      - listitem [ref=f8e135]:
+        - link "Issues" [ref=f8e136] [cursor=pointer]:
+          - /url: https://github.com/cloudpanel-io/cloudpanel-ce/issues
+        - text: "|"
+      - listitem [ref=f8e137]:
+        - link "Contact" [ref=f8e138] [cursor=pointer]:
+          - /url: https://www.cloudpanel.io/contact/
+        - text: "|"
+      - listitem [ref=f8e139]:
+        - text: © 2026
+        - link "CloudPanel" [ref=f8e140] [cursor=pointer]:
+          - /url: https://www.cloudpanel.io

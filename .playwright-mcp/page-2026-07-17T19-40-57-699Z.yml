@@ -1,0 +1,48 @@
+- application [active] [ref=f7e1]:
+  - region "Header" [ref=f7e2]:
+    - heading "Header"
+    - link [ref=f7e3] [cursor=pointer]:
+      - /url: https://www.proxmox.com
+      - img "Proxmox" [ref=f7e4]
+    - generic [ref=f7e5]: Virtual Environment
+    - textbox [ref=f7e6]:
+      - /placeholder: Search
+    - button " Documentation" [ref=f7e7] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e8]: Documentation
+    - button " Create VM" [ref=f7e9] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e10]: Create VM
+    - button " Create CT" [ref=f7e11] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e12]: Create CT
+    - button " root@pam" [ref=f7e13] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e14]: root@pam
+  - combobox [ref=f7e15]: Server View
+  - button "" [ref=f7e16] [cursor=pointer]
+  - treegrid [ref=f7e17]:
+    - rowgroup:
+      - row:
+        - columnheader
+    - rowgroup [ref=f7e18]:
+      - row [expanded] [level=1] [ref=f7e19]:
+        - gridcell " Datacenter" [ref=f7e20]
+  - separator [ref=f7e22]
+  - separator [ref=f7e23]
+  - region "Logs" [ref=f7e24]:
+    - heading "Logs"
+    - tablist [ref=f7e25]:
+      - tab "Tasks" [selected] [ref=f7e26] [cursor=pointer]
+      - tab "Cluster log" [ref=f7e27] [cursor=pointer]
+    - tabpanel "Tasks" [ref=f7e28]:
+      - rowgroup [ref=f7e29]:
+        - row [ref=f7e30]:
+          - columnheader "Start Time" [ref=f7e31]
+          - columnheader "End Time" [ref=f7e32]
+          - columnheader "Node" [ref=f7e33]
+          - columnheader "User name" [ref=f7e34]
+          - columnheader "Description" [ref=f7e35]
+          - columnheader "Status" [ref=f7e36]
+          - columnheader [ref=f7e37]
+      - rowgroup [ref=f7e38]

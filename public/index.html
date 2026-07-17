@@ -2,17 +2,29 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mac Audio → iPhone</title>
-  <style>
-    body { font-family: -apple-system, system-ui, sans-serif; max-width: 620px;
-           margin: 60px auto; padding: 0 20px; line-height: 1.6; }
-    a { display:inline-block; margin:8px 12px 8px 0; font-size:1.2rem; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a84ff" />
+  <title>Mac Audio</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/icon-180.png" />
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <h1>Mac Audio → iPhone</h1>
-  <p><strong>No Mac:</strong> <a href="/broadcast">/broadcast</a> (capturar microfone)</p>
-  <p><strong>No iPhone:</strong> <a href="/listen">/listen</a> (escutar)</p>
+  <main class="wrap">
+    <div class="app-head">
+      <div class="logo">🔊</div>
+      <div><h1>Mac Audio</h1><div class="sub">microfone do Mac ao vivo no iPhone</div></div>
+    </div>
+    <a class="card" href="/broadcast" style="display:block; text-decoration:none; color:inherit">
+      <h2>No Mac</h2>
+      <div style="font-size:1.15rem; font-weight:600">🎙️ Transmitir microfone →</div>
+      <div class="muted">Capture o mic e deixe esta aba aberta</div>
+    </a>
+    <a class="card" href="/listen" style="display:block; text-decoration:none; color:inherit">
+      <h2>No iPhone</h2>
+      <div style="font-size:1.15rem; font-weight:600">🎧 Escutar →</div>
+      <div class="muted">Ouça ao vivo · adicione à Tela de Início como app</div>
+    </a>
+  </main>
 </body>
 </html>

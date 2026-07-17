@@ -1,0 +1,235 @@
+- generic [active] [ref=f6e1]:
+  - generic [ref=f6e3]:
+    - link "Do you like CloudPanel? Please write a short review to support us." [ref=f6e4] [cursor=pointer]:
+      - /url: https://g.page/mgtcommerce/review?rc
+    - button "Close" [ref=f6e5] [cursor=pointer]
+  - banner [ref=f6e6]:
+    - link [ref=f6e8] [cursor=pointer]:
+      - /url: /
+      - img "CloudPanel" [ref=f6e9]
+    - generic [ref=f6e10]:
+      - generic [ref=f6e11]:
+        - link "Dashboard" [ref=f6e12] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Sites" [ref=f6e13] [cursor=pointer]:
+          - /url: /
+      - list [ref=f6e15]:
+        - listitem [ref=f6e16]:
+          - link [ref=f6e17] [cursor=pointer]:
+            - /url: javascript:void(0);
+        - listitem [ref=f6e20]:
+          - link "Admin Area" [ref=f6e21] [cursor=pointer]:
+            - /url: /admin/users
+        - listitem [ref=f6e24]:
+          - button [ref=f6e25] [cursor=pointer]:
+            - img "Leonardo Dias" [ref=f6e26]
+  - main [ref=f6e27]:
+    - generic [ref=f6e30]:
+      - generic [ref=f6e31]:
+        - generic [ref=f6e32]:
+          - heading "Domain" [level=3] [ref=f6e33]
+          - link "rec.binarytech.com.br" [ref=f6e35] [cursor=pointer]:
+            - /url: https://rec.binarytech.com.br
+        - generic [ref=f6e38]:
+          - heading "Site User" [level=3] [ref=f6e39]
+          - link "rec" [ref=f6e41] [cursor=pointer]:
+            - /url: javascript:void(0);
+        - generic [ref=f6e42]:
+          - heading "IP Address" [level=3] [ref=f6e43]
+          - link "179.247.134.101" [ref=f6e45] [cursor=pointer]:
+            - /url: javascript:void(0);
+      - generic [ref=f6e46]:
+        - list [ref=f6e48]:
+          - listitem [ref=f6e49]:
+            - link "Settings" [ref=f6e50] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/settings
+          - listitem [ref=f6e51]:
+            - link "Vhost" [ref=f6e52] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/vhost
+          - listitem [ref=f6e53]:
+            - link "Databases" [ref=f6e54] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/databases
+          - listitem [ref=f6e55]:
+            - link "SSL/TLS" [ref=f6e56] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/certificates
+          - listitem [ref=f6e57]:
+            - link "Security" [ref=f6e58] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/security
+          - listitem [ref=f6e59]:
+            - link "SSH/FTP" [ref=f6e60] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/users
+          - listitem [ref=f6e61]:
+            - link "File Manager" [ref=f6e62] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/file-manager
+          - listitem [ref=f6e63]:
+            - link "Cron Jobs" [ref=f6e64] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/cron-jobs
+          - listitem [ref=f6e65]:
+            - link "Logs" [ref=f6e66] [cursor=pointer]:
+              - /url: /site/rec.binarytech.com.br/logs
+        - generic [ref=f6e69]:
+          - generic [ref=f6e70]: Vhost Editor
+          - generic [ref=f6e72]:
+            - textbox [ref=f6e73]
+            - generic [ref=f6e75]:
+              - generic [ref=f6e76]: "1"
+              - generic [ref=f6e77]: "2"
+              - generic [ref=f6e78]: "3"
+              - generic [ref=f6e79]: "4"
+              - generic [ref=f6e80]: "5"
+              - generic [ref=f6e81]: "6"
+              - generic [ref=f6e82]: "7"
+              - generic [ref=f6e83]: "8"
+              - generic [ref=f6e84]: "9"
+              - generic [ref=f6e85]: "10"
+              - generic [ref=f6e86]: "11"
+              - generic [ref=f6e87]: "12"
+              - generic [ref=f6e88]: "13"
+              - generic [ref=f6e89]: "14"
+              - generic [ref=f6e90]: "15"
+              - generic [ref=f6e91]: "16"
+              - generic [ref=f6e92]: "17"
+              - generic [ref=f6e93]: "18"
+              - generic [ref=f6e94]: "19"
+              - generic [ref=f6e95]: "20"
+              - generic [ref=f6e96]: "21"
+              - generic [ref=f6e97]: "22"
+              - generic [ref=f6e98]: "23"
+              - generic [ref=f6e99]: "24"
+              - generic [ref=f6e100]: "25"
+              - generic [ref=f6e101]: "26"
+              - generic [ref=f6e102]: "27"
+              - generic [ref=f6e103]: "28"
+              - generic [ref=f6e104]: "29"
+              - generic [ref=f6e105]: "30"
+              - generic [ref=f6e106]: "31"
+              - generic [ref=f6e107]: "32"
+              - generic [ref=f6e108]: "33"
+              - generic [ref=f6e109]: "34"
+              - generic [ref=f6e110]: "35"
+              - generic [ref=f6e111]: "36"
+              - generic [ref=f6e112]: "37"
+              - generic [ref=f6e113]: "38"
+              - generic [ref=f6e114]: "39"
+              - generic [ref=f6e115]: "40"
+              - generic [ref=f6e116]: "41"
+              - generic [ref=f6e117]: "42"
+              - generic [ref=f6e118]: "43"
+              - generic [ref=f6e119]: "44"
+              - generic [ref=f6e120]: "45"
+              - generic [ref=f6e121]: "46"
+              - generic [ref=f6e122]: "47"
+              - generic [ref=f6e123]: "48"
+              - generic [ref=f6e124]: "49"
+              - generic [ref=f6e125]: "50"
+              - generic [ref=f6e126]: "51"
+              - generic [ref=f6e127]: "52"
+              - generic [ref=f6e128]: "53"
+              - generic [ref=f6e129]: "54"
+            - generic [ref=f6e131]:
+              - generic:
+                - generic: "server {"
+                - generic: listen 80;
+                - generic: listen [::]:80;
+                - generic: listen 443 quic;
+                - generic: listen 443 ssl;
+                - generic: listen [::]:443 quic;
+                - generic: listen [::]:443 ssl;
+                - generic: http2 on;
+                - generic: http3 off;
+                - generic: "{{ssl_certificate_key}}"
+                - generic: "{{ssl_certificate}}"
+                - generic: server_name rec.binarytech.com.br;
+                - generic: "{{root}}"
+                - generic: "{{nginx_access_log}}"
+                - generic: "{{nginx_error_log}}"
+                - generic: "if ($scheme != \"https\") {"
+                - generic: rewrite ^ https://$host$request_uri permanent;
+                - generic: "}"
+                - generic: "location ~ /.well-known {"
+                - generic: auth_basic off;
+                - generic: allow all;
+                - generic: "}"
+                - generic: "{{settings}}"
+                - generic: include /etc/nginx/global_settings;
+                - generic: index index.html;
+                - generic: "location / {"
+                - generic: "proxy_pass http://127.0.0.1:{{app_port}}/;"
+                - generic: proxy_http_version 1.1;
+                - generic: proxy_set_header X-Forwarded-Host $host;
+                - generic: proxy_set_header X-Forwarded-Server $host;
+                - generic: proxy_set_header X-Real-IP $remote_addr;
+                - generic: proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                - generic: proxy_set_header X-Forwarded-Proto $scheme;
+                - generic: proxy_set_header Host $host;
+                - generic: proxy_set_header Upgrade $http_upgrade;
+                - generic: proxy_set_header Connection "Upgrade";
+                - generic: proxy_pass_request_headers on;
+                - generic: proxy_max_temp_file_size 0;
+                - generic: proxy_connect_timeout 900;
+                - generic: proxy_send_timeout 900;
+                - generic: proxy_read_timeout 900;
+                - generic: proxy_buffer_size 128k;
+                - generic: proxy_buffers 4 256k;
+                - generic: proxy_busy_buffers_size 256k;
+                - generic: proxy_temp_file_write_size 256k;
+                - generic: "}"
+                - generic: "}"
+          - button "Save" [ref=f6e133] [cursor=pointer]
+  - contentinfo [ref=f6e134]:
+    - list [ref=f6e136]:
+      - listitem [ref=f6e137]:
+        - combobox [ref=f6e139]:
+          - option "Arabic"
+          - option "Bosnian"
+          - option "Bulgarian"
+          - option "Chinese (Simplified)"
+          - option "Chinese (Taiwan)"
+          - option "Czech"
+          - option "English" [selected]
+          - option "Finnish"
+          - option "French"
+          - option "German"
+          - option "Danish"
+          - option "Dutch"
+          - option "Georgian"
+          - option "Greek"
+          - option "Hebrew"
+          - option "Hungarian"
+          - option "Korean"
+          - option "Lithuanian"
+          - option "Indonesian"
+          - option "Italian"
+          - option "Japanese"
+          - option "Spanish"
+          - option "Persian"
+          - option "Polish"
+          - option "Portuguese (Brasil)"
+          - option "Romanian"
+          - option "Russian"
+          - option "Slovak"
+          - option "Serbian"
+          - option "Thai"
+          - option "Turkish"
+          - option "Ukrainian"
+          - option "Vietnamese"
+      - listitem [ref=f6e140]:
+        - link "Blog" [ref=f6e141] [cursor=pointer]:
+          - /url: https://www.cloudpanel.io/blog/
+        - text: "|"
+      - listitem [ref=f6e142]:
+        - link "Docs" [ref=f6e143] [cursor=pointer]:
+          - /url: https://www.cloudpanel.io/docs/v2/
+        - text: "|"
+      - listitem [ref=f6e144]:
+        - link "Issues" [ref=f6e145] [cursor=pointer]:
+          - /url: https://github.com/cloudpanel-io/cloudpanel-ce/issues
+        - text: "|"
+      - listitem [ref=f6e146]:
+        - link "Contact" [ref=f6e147] [cursor=pointer]:
+          - /url: https://www.cloudpanel.io/contact/
+        - text: "|"
+      - listitem [ref=f6e148]:
+        - text: © 2026
+        - link "CloudPanel" [ref=f6e149] [cursor=pointer]:
+          - /url: https://www.cloudpanel.io

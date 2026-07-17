@@ -1,0 +1,497 @@
+- application [ref=f7e1]:
+  - region "Header" [ref=f7e2]:
+    - heading "Header"
+    - link [ref=f7e3] [cursor=pointer]:
+      - /url: https://www.proxmox.com
+      - img "Proxmox" [ref=f7e4]
+    - generic [ref=f7e5]: Virtual Environment 9.0.10
+    - textbox [ref=f7e6]:
+      - /placeholder: Search
+    - button " Documentation" [ref=f7e7] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e8]: Documentation
+    - button " Create VM" [ref=f7e9] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e10]: Create VM
+    - button " Create CT" [ref=f7e11] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e12]: Create CT
+    - button " root@pam" [ref=f7e13] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e14]: root@pam
+  - toolbar [ref=f7e813]:
+    - generic [ref=f7e814]: Virtual Machine 101 (cloudpanel) on node 'lab'
+    - generic [ref=f7e815]: No Tags
+    - text:   
+    - generic [ref=f7e816] [cursor=pointer]: 
+    - text: 
+    - button " Start" [disabled]:
+      - text: 
+      - generic: Start
+    - button " Shutdown" [ref=f7e818] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e819]: Shutdown
+      - button " Shutdown"
+    - text: 
+    - button " Console" [ref=f7e820] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e821]: Console
+      - button " Console"
+    - button "More" [ref=f7e822] [cursor=pointer]
+    - button " Help" [ref=f7e824] [cursor=pointer]:
+      - text: 
+      - generic [ref=f7e825]: Help
+  - toolbar [ref=f7e826]:
+    - generic [ref=f7e827]:
+      - text:            
+      - list [ref=f7e828]:
+        - listitem [ref=f7e829]:
+          - generic [ref=f7e831]:
+            - generic [ref=f7e832]: 
+            - generic [ref=f7e833] [cursor=pointer]: Summary
+            - text: 
+          - list
+        - listitem [ref=f7e834]:
+          - generic [ref=f7e836]:
+            - generic [ref=f7e837]: 
+            - generic [ref=f7e838] [cursor=pointer]: Console
+            - text: 
+          - list
+        - listitem [ref=f7e839]:
+          - generic [ref=f7e841]:
+            - generic [ref=f7e842]: 
+            - generic [ref=f7e843] [cursor=pointer]: Hardware
+            - text: 
+          - list
+        - listitem [ref=f7e844]:
+          - generic [ref=f7e846]:
+            - generic [ref=f7e847]: 
+            - generic [ref=f7e848] [cursor=pointer]: Cloud-Init
+            - text: 
+          - list
+        - listitem [ref=f7e849]:
+          - generic [ref=f7e851]:
+            - generic [ref=f7e852]: 
+            - generic [ref=f7e853] [cursor=pointer]: Options
+            - text: 
+          - list
+        - listitem [ref=f7e854]:
+          - generic [ref=f7e856]:
+            - generic [ref=f7e857]: 
+            - generic [ref=f7e858] [cursor=pointer]: Task History
+            - text: 
+          - list
+        - listitem [ref=f7e859]:
+          - generic [ref=f7e861]:
+            - generic [ref=f7e862]: 
+            - generic [ref=f7e863] [cursor=pointer]: Monitor
+            - text: 
+          - list
+        - listitem [ref=f7e864]:
+          - generic [ref=f7e866]:
+            - generic [ref=f7e867]: 
+            - generic [ref=f7e868] [cursor=pointer]: Backup
+            - text: 
+          - list
+        - listitem [ref=f7e869]:
+          - generic [ref=f7e871]:
+            - generic [ref=f7e872]: 
+            - generic [ref=f7e873] [cursor=pointer]: Replication
+            - text: 
+          - list
+        - listitem [ref=f7e874]:
+          - generic [ref=f7e876]:
+            - generic [ref=f7e877]: 
+            - generic [ref=f7e878] [cursor=pointer]: Snapshots
+            - text: 
+          - list
+        - listitem [ref=f7e879]:
+          - generic [ref=f7e881]:
+            - generic [ref=f7e882]: 
+            - generic [ref=f7e883] [cursor=pointer]: Firewall
+            - generic [ref=f7e884] [cursor=pointer]: 
+          - text:        
+        - listitem [ref=f7e885]:
+          - generic [ref=f7e887]:
+            - generic [ref=f7e888]: 
+            - generic [ref=f7e889] [cursor=pointer]: Permissions
+            - text: 
+          - list
+  - group [ref=f7e890]:
+    - combobox [ref=f7e891]: Hour (average)
+  - text: Status
+  - generic [ref=f7e894]:
+    - generic [ref=f7e895]: 
+    - text: Status
+  - generic [ref=f7e897]:
+    - generic [ref=f7e898]: 
+    - text: HA State
+  - generic [ref=f7e899]:
+    - generic [ref=f7e900]:
+      - generic [ref=f7e901]: 
+      - text: Node
+    - generic [ref=f7e902]: lab
+  - text: 
+  - generic [ref=f7e904]: CPU usage
+  - progressbar [ref=f7e907]: 0% 0%
+  - generic [ref=f7e908]: Memory usage
+  - progressbar [ref=f7e911]: 0% 0%
+  - generic [ref=f7e912]: Host memory usage
+  - text: 
+  - generic [ref=f7e916]:
+    - generic [ref=f7e917]: 
+    - text: Bootdisk size
+  - generic [ref=f7e919]:
+    - generic [ref=f7e920]: 
+    - text: IPs
+  - toolbar [ref=f7e921]:
+    - text: Notes
+    - button "Edit notes" [ref=f7e922] [cursor=pointer]: 
+    - button "Collapse panel" [ref=f7e923] [cursor=pointer]
+  - text: 
+  - toolbar [ref=f7e924]:
+    - text: CPU Usage
+    - listbox [ref=f7e925] [cursor=pointer]:
+      - option "CPU usage" [ref=f7e928]
+    - button "Undo Zoom" [disabled] [ref=f7e930] [cursor=pointer]
+  - toolbar [ref=f7e952]:
+    - text: Memory Usage
+    - listbox [ref=f7e953] [cursor=pointer]:
+      - generic [ref=f7e955]:
+        - option "Total" [ref=f7e956]
+        - option "Used" [ref=f7e958]
+        - option "Host Memory Usage" [ref=f7e960]
+    - button "Undo Zoom" [disabled] [ref=f7e962] [cursor=pointer]
+  - toolbar [ref=f7e984]:
+    - text: Network Traffic
+    - listbox [ref=f7e985] [cursor=pointer]:
+      - generic [ref=f7e987]:
+        - option "Incoming" [ref=f7e988]
+        - option "Outgoing" [ref=f7e990]
+    - button "Undo Zoom" [disabled] [ref=f7e992] [cursor=pointer]
+  - toolbar [ref=f7e1014]:
+    - text: Disk IO
+    - listbox [ref=f7e1015] [cursor=pointer]:
+      - generic [ref=f7e1017]:
+        - option "Reads" [ref=f7e1018]
+        - option "Writes" [ref=f7e1020]
+    - button "Undo Zoom" [disabled] [ref=f7e1022] [cursor=pointer]
+  - toolbar [ref=f7e1044]:
+    - text: CPU Pressure Stall
+    - listbox [ref=f7e1045] [cursor=pointer]:
+      - generic [ref=f7e1047]:
+        - option "Some" [ref=f7e1048]
+        - option "Full" [ref=f7e1050]
+    - button "Undo Zoom" [disabled] [ref=f7e1052] [cursor=pointer]
+  - toolbar [ref=f7e1074]:
+    - text: IO Pressure Stall
+    - listbox [ref=f7e1075] [cursor=pointer]:
+      - generic [ref=f7e1077]:
+        - option "Some" [ref=f7e1078]
+        - option "Full" [ref=f7e1080]
+    - button "Undo Zoom" [disabled] [ref=f7e1082] [cursor=pointer]
+  - toolbar [ref=f7e1104]:
+    - text: Memory Pressure Stall
+    - listbox [ref=f7e1105] [cursor=pointer]:
+      - generic [ref=f7e1107]:
+        - option "Some" [ref=f7e1108]
+        - option "Full" [ref=f7e1110]
+    - button "Undo Zoom" [disabled] [ref=f7e1112] [cursor=pointer]
+  - combobox [ref=f7e15]: Server View
+  - button "" [ref=f7e16] [cursor=pointer]
+  - treegrid [ref=f7e17]:
+    - rowgroup:
+      - row:
+        - columnheader
+    - rowgroup [ref=f7e18]:
+      - row [expanded] [level=1] [ref=f7e1134]:
+        - gridcell " Datacenter" [ref=f7e1135]
+      - row [expanded] [level=2] [ref=f7e1137]:
+        - gridcell " lab" [ref=f7e1138]:
+          - generic [ref=f7e1139]:
+            - text: 
+            - generic [ref=f7e1140]: lab
+      - row [level=3] [ref=f7e1141]:
+        - gridcell " 100 (truenas)" [ref=f7e1142]:
+          - generic [ref=f7e1143]:
+            - text: 
+            - generic [ref=f7e1144]: 100 (truenas)
+      - row [level=3] [ref=f7e1145]:
+        - gridcell " 101 (cloudpanel)" [active] [ref=f7e1146]:
+          - generic [ref=f7e1147]:
+            - text: 
+            - generic [ref=f7e1148]: 101 (cloudpanel)
+      - row [level=3] [ref=f7e1149]:
+        - gridcell " 102 (paperclip-ai)" [ref=f7e1150]:
+          - generic [ref=f7e1151]:
+            - text: 
+            - generic [ref=f7e1152]: 102 (paperclip-ai)
+      - row [level=3] [ref=f7e1153]:
+        - gridcell " 103 (coolify)" [ref=f7e1154]:
+          - generic [ref=f7e1155]:
+            - text: 
+            - generic [ref=f7e1156]: 103 (coolify)
+      - row [level=3] [ref=f7e1157]:
+        - gridcell " 104 (vitodeploy)" [ref=f7e1158]:
+          - generic [ref=f7e1159]:
+            - text: 
+            - generic [ref=f7e1160]: 104 (vitodeploy)
+      - row [level=3] [ref=f7e1161]:
+        - gridcell " localnetwork (lab)" [ref=f7e1162]:
+          - generic [ref=f7e1163]:
+            - text: 
+            - generic [ref=f7e1164]: localnetwork (lab)
+      - row [level=3] [ref=f7e1165]:
+        - gridcell [ref=f7e1166]:
+          - generic [ref=f7e1167]:
+            - text: 
+            - generic [ref=f7e1168]: local (lab)
+      - row [level=3] [ref=f7e1173]:
+        - gridcell [ref=f7e1174]:
+          - generic [ref=f7e1175]:
+            - text: 
+            - generic [ref=f7e1176]: local-lvm (lab)
+  - separator [ref=f7e22]
+  - separator [ref=f7e23]
+  - region "Logs" [ref=f7e24]:
+    - heading "Logs"
+    - tablist [ref=f7e25]:
+      - tab "Tasks" [selected] [ref=f7e26] [cursor=pointer]
+      - tab "Cluster log" [ref=f7e27] [cursor=pointer]
+    - tabpanel "Tasks" [ref=f7e28]:
+      - rowgroup [ref=f7e29]:
+        - row [ref=f7e30]:
+          - columnheader "Start Time" [ref=f7e31]
+          - columnheader "End Time" [ref=f7e32]
+          - columnheader "Node" [ref=f7e33]
+          - columnheader "User name" [ref=f7e34]
+          - columnheader "Description" [ref=f7e35]
+          - columnheader "Status" [ref=f7e36]
+          - columnheader [ref=f7e37]
+      - rowgroup [ref=f7e38]:
+        - row [ref=f7e1181]:
+          - gridcell "Jul 17 02:08:17" [ref=f7e1182]
+          - gridcell "Jul 17 02:08:23" [ref=f7e1184]
+          - gridcell "lab" [ref=f7e1186]
+          - gridcell "root@pam" [ref=f7e1188]
+          - gridcell "Update package database" [ref=f7e1190]
+          - gridcell "OK" [ref=f7e1192]
+          - gridcell [ref=f7e1194]:
+            - button "" [ref=f7e1196] [cursor=pointer]
+        - row [ref=f7e1197]:
+          - gridcell "Jul 16 04:46:18" [ref=f7e1198]
+          - gridcell "Jul 16 04:46:23" [ref=f7e1200]
+          - gridcell "lab" [ref=f7e1202]
+          - gridcell "root@pam" [ref=f7e1204]
+          - gridcell "Update package database" [ref=f7e1206]
+          - gridcell "OK" [ref=f7e1208]
+          - gridcell [ref=f7e1210]:
+            - button "" [ref=f7e1212] [cursor=pointer]
+        - row [ref=f7e1213]:
+          - gridcell "Jul 15 03:10:17" [ref=f7e1214]
+          - gridcell "Jul 15 03:10:21" [ref=f7e1216]
+          - gridcell "lab" [ref=f7e1218]
+          - gridcell "root@pam" [ref=f7e1220]
+          - gridcell "Update package database" [ref=f7e1222]
+          - gridcell "OK" [ref=f7e1224]
+          - gridcell [ref=f7e1226]:
+            - button "" [ref=f7e1228] [cursor=pointer]
+        - row [ref=f7e1229]:
+          - gridcell "Jul 14 02:42:45" [ref=f7e1230]
+          - gridcell "Jul 14 02:42:51" [ref=f7e1232]
+          - gridcell "lab" [ref=f7e1234]
+          - gridcell "root@pam" [ref=f7e1236]
+          - gridcell "Update package database" [ref=f7e1238]
+          - gridcell "OK" [ref=f7e1240]
+          - gridcell [ref=f7e1242]:
+            - button "" [ref=f7e1244] [cursor=pointer]
+        - row [ref=f7e1245]:
+          - gridcell "Jul 13 01:41:17" [ref=f7e1246]
+          - gridcell "Jul 13 01:41:22" [ref=f7e1248]
+          - gridcell "lab" [ref=f7e1250]
+          - gridcell "root@pam" [ref=f7e1252]
+          - gridcell "Update package database" [ref=f7e1254]
+          - gridcell "OK" [ref=f7e1256]
+          - gridcell [ref=f7e1258]:
+            - button "" [ref=f7e1260] [cursor=pointer]
+        - row [ref=f7e1261]:
+          - gridcell "Jul 12 12:07:59" [ref=f7e1262]
+          - gridcell "Jul 13 16:03:21" [ref=f7e1264]
+          - gridcell "lab" [ref=f7e1266]
+          - gridcell "root@pam" [ref=f7e1268]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1270]
+          - gridcell "OK" [ref=f7e1272]
+          - gridcell [ref=f7e1274]:
+            - button "" [ref=f7e1276] [cursor=pointer]
+        - row [ref=f7e1277]:
+          - gridcell "Jul 12 12:07:55" [ref=f7e1278]
+          - gridcell "Jul 12 12:07:58" [ref=f7e1280]
+          - gridcell "lab" [ref=f7e1282]
+          - gridcell "root@pam" [ref=f7e1284]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1286]
+          - gridcell "OK" [ref=f7e1288]
+          - gridcell [ref=f7e1290]:
+            - button "" [ref=f7e1292] [cursor=pointer]
+        - row [ref=f7e1293]:
+          - gridcell "Jul 12 12:07:49" [ref=f7e1294]
+          - gridcell "Jul 12 12:07:54" [ref=f7e1296]
+          - gridcell "lab" [ref=f7e1298]
+          - gridcell "root@pam" [ref=f7e1300]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1302]
+          - gridcell "OK" [ref=f7e1304]
+          - gridcell [ref=f7e1306]:
+            - button "" [ref=f7e1308] [cursor=pointer]
+        - row [ref=f7e1309]:
+          - gridcell "Jul 12 09:52:33" [ref=f7e1310]
+          - gridcell "Jul 12 12:07:49" [ref=f7e1312]
+          - gridcell "lab" [ref=f7e1314]
+          - gridcell "root@pam" [ref=f7e1316]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1318]
+          - gridcell "OK" [ref=f7e1320]
+          - gridcell [ref=f7e1322]:
+            - button "" [ref=f7e1324] [cursor=pointer]
+        - row [ref=f7e1325]:
+          - gridcell "Jul 12 05:39:27" [ref=f7e1326]
+          - gridcell "Jul 12 05:54:28" [ref=f7e1328]
+          - gridcell "lab" [ref=f7e1330]
+          - gridcell "root@pam" [ref=f7e1332]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1334]
+          - gridcell "OK" [ref=f7e1336]
+          - gridcell [ref=f7e1338]:
+            - button "" [ref=f7e1340] [cursor=pointer]
+        - row [ref=f7e1341]:
+          - gridcell "Jul 12 05:22:12" [ref=f7e1342]
+          - gridcell "Jul 12 05:37:59" [ref=f7e1344]
+          - gridcell "lab" [ref=f7e1346]
+          - gridcell "root@pam" [ref=f7e1348]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1350]
+          - gridcell "OK" [ref=f7e1352]
+          - gridcell [ref=f7e1354]:
+            - button "" [ref=f7e1356] [cursor=pointer]
+        - row [ref=f7e1357]:
+          - gridcell "Jul 12 04:55:46" [ref=f7e1358]
+          - gridcell "Jul 12 05:22:06" [ref=f7e1360]
+          - gridcell "lab" [ref=f7e1362]
+          - gridcell "root@pam" [ref=f7e1364]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1366]
+          - gridcell "OK" [ref=f7e1368]
+          - gridcell [ref=f7e1370]:
+            - button "" [ref=f7e1372] [cursor=pointer]
+        - row [ref=f7e1373]:
+          - gridcell "Jul 12 04:39:43" [ref=f7e1374]
+          - gridcell "Jul 12 04:54:46" [ref=f7e1376]
+          - gridcell "lab" [ref=f7e1378]
+          - gridcell "root@pam" [ref=f7e1380]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1382]
+          - gridcell "OK" [ref=f7e1384]
+          - gridcell [ref=f7e1386]:
+            - button "" [ref=f7e1388] [cursor=pointer]
+        - row [ref=f7e1389]:
+          - gridcell "Jul 12 04:21:47" [ref=f7e1390]
+          - gridcell "Jul 12 04:38:08" [ref=f7e1392]
+          - gridcell "lab" [ref=f7e1394]
+          - gridcell "root@pam" [ref=f7e1396]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1398]
+          - gridcell "OK" [ref=f7e1400]
+          - gridcell [ref=f7e1402]:
+            - button "" [ref=f7e1404] [cursor=pointer]
+        - row [ref=f7e1405]:
+          - gridcell "Jul 12 04:07:17" [ref=f7e1406]
+          - gridcell "Jul 12 04:07:23" [ref=f7e1408]
+          - gridcell "lab" [ref=f7e1410]
+          - gridcell "root@pam" [ref=f7e1412]
+          - gridcell "Update package database" [ref=f7e1414]
+          - gridcell "OK" [ref=f7e1416]
+          - gridcell [ref=f7e1418]:
+            - button "" [ref=f7e1420] [cursor=pointer]
+        - row [ref=f7e1421]:
+          - gridcell "Jul 12 03:44:59" [ref=f7e1422]
+          - gridcell "Jul 12 04:18:18" [ref=f7e1424]
+          - gridcell "lab" [ref=f7e1426]
+          - gridcell "root@pam" [ref=f7e1428]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1430]
+          - gridcell "OK" [ref=f7e1432]
+          - gridcell [ref=f7e1434]:
+            - button "" [ref=f7e1436] [cursor=pointer]
+        - row [ref=f7e1437]:
+          - gridcell "Jul 12 03:19:56" [ref=f7e1438]
+          - gridcell "Jul 12 03:43:35" [ref=f7e1440]
+          - gridcell "lab" [ref=f7e1442]
+          - gridcell "root@pam" [ref=f7e1444]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1446]
+          - gridcell "OK" [ref=f7e1448]
+          - gridcell [ref=f7e1450]:
+            - button "" [ref=f7e1452] [cursor=pointer]
+        - row [ref=f7e1453]:
+          - gridcell "Jul 12 03:01:27" [ref=f7e1454]
+          - gridcell "Jul 12 03:18:29" [ref=f7e1456]
+          - gridcell "lab" [ref=f7e1458]
+          - gridcell "root@pam" [ref=f7e1460]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1462]
+          - gridcell "OK" [ref=f7e1464]
+          - gridcell [ref=f7e1466]:
+            - button "" [ref=f7e1468] [cursor=pointer]
+        - row [ref=f7e1469]:
+          - gridcell "Jul 12 02:29:25" [ref=f7e1470]
+          - gridcell "Jul 12 02:44:29" [ref=f7e1472]
+          - gridcell "lab" [ref=f7e1474]
+          - gridcell "root@pam" [ref=f7e1476]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1478]
+          - gridcell "OK" [ref=f7e1480]
+          - gridcell [ref=f7e1482]:
+            - button "" [ref=f7e1484] [cursor=pointer]
+        - row [ref=f7e1485]:
+          - gridcell "Jul 12 02:00:57" [ref=f7e1486]
+          - gridcell "Jul 12 02:26:43" [ref=f7e1488]
+          - gridcell "lab" [ref=f7e1490]
+          - gridcell "root@pam" [ref=f7e1492]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1494]
+          - gridcell "OK" [ref=f7e1496]
+          - gridcell [ref=f7e1498]:
+            - button "" [ref=f7e1500] [cursor=pointer]
+        - row [ref=f7e1501]:
+          - gridcell "Jul 12 01:44:23" [ref=f7e1502]
+          - gridcell "Jul 12 01:59:32" [ref=f7e1504]
+          - gridcell "lab" [ref=f7e1506]
+          - gridcell "root@pam" [ref=f7e1508]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1510]
+          - gridcell "OK" [ref=f7e1512]
+          - gridcell [ref=f7e1514]:
+            - button "" [ref=f7e1516] [cursor=pointer]
+        - row [ref=f7e1517]:
+          - gridcell "Jul 12 01:27:11" [ref=f7e1518]
+          - gridcell "Jul 12 01:43:00" [ref=f7e1520]
+          - gridcell "lab" [ref=f7e1522]
+          - gridcell "root@pam" [ref=f7e1524]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1526]
+          - gridcell "OK" [ref=f7e1528]
+          - gridcell [ref=f7e1530]:
+            - button "" [ref=f7e1532] [cursor=pointer]
+        - row [ref=f7e1533]:
+          - gridcell "Jul 12 01:11:14" [ref=f7e1534]
+          - gridcell "Jul 12 01:26:16" [ref=f7e1536]
+          - gridcell "lab" [ref=f7e1538]
+          - gridcell "root@pam" [ref=f7e1540]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1542]
+          - gridcell "OK" [ref=f7e1544]
+          - gridcell [ref=f7e1546]:
+            - button "" [ref=f7e1548] [cursor=pointer]
+        - row [ref=f7e1549]:
+          - gridcell "Jul 12 00:51:31" [ref=f7e1550]
+          - gridcell "Jul 12 01:08:30" [ref=f7e1552]
+          - gridcell "lab" [ref=f7e1554]
+          - gridcell "root@pam" [ref=f7e1556]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1558]
+          - gridcell "OK" [ref=f7e1560]
+          - gridcell [ref=f7e1562]:
+            - button "" [ref=f7e1564] [cursor=pointer]
+        - row [ref=f7e1565]:
+          - gridcell "Jul 12 00:19:27" [ref=f7e1566]
+          - gridcell "Jul 12 00:49:49" [ref=f7e1568]
+          - gridcell "lab" [ref=f7e1570]
+          - gridcell "root@pam" [ref=f7e1572]
+          - gridcell "VM/CT 103 - Console" [ref=f7e1574]
+          - gridcell "OK" [ref=f7e1576]
+          - gridcell [ref=f7e1578]:
+            - button "" [ref=f7e1580] [cursor=pointer]
+  - generic: ()

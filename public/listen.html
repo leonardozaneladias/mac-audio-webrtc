@@ -2,242 +2,75 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Escutar · Mic do Mac</title>
-  <style>
-    :root { color-scheme: light dark; }
-    body { font-family: -apple-system, system-ui, sans-serif; max-width: 620px;
-           margin: 40px auto; padding: 0 20px; line-height: 1.5; text-align: center; }
-    h1 { font-size: 1.4rem; }
-    button { font-size: 1.3rem; padding: 18px 30px; border-radius: 16px;
-             border: none; background: #0a84ff; color: #fff; cursor: pointer; }
-    button:disabled { opacity: .5; }
-    .status { margin-top: 24px; padding: 16px; border-radius: 12px;
-              background: rgba(127,127,127,.12); }
-    .dot { display:inline-block; width:10px; height:10px; border-radius:50%;
-           background:#888; margin-right:8px; vertical-align: middle; }
-    .on { background:#30d158; }
-    .vol { margin-top: 26px; }
-    .vol.hidden { display: none; }
-    .vol label { font-weight: 600; display:block; margin-bottom: 10px; }
-    input[type=range] { width: 100%; height: 34px; }
-    #mute { margin-top: 14px; font-size: 1rem; padding: 10px 18px;
-            background: rgba(127,127,127,.2); color: inherit; }
-    #pct { font-variant-numeric: tabular-nums; }
-    .conn { margin-top: 26px; padding: 16px; border-radius: 12px;
-            background: rgba(127,127,127,.12); }
-    .conn.hidden { display: none; }
-    .badge { display:inline-block; padding: 6px 14px; border-radius: 999px;
-             font-weight: 700; color: #fff; background: #888; }
-    .metrics { display:flex; justify-content: space-around; margin-top: 14px; gap: 8px; }
-    .metric { flex: 1; }
-    .metric .v { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-    .metric .l { font-size: .8rem; opacity: .7; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="theme-color" content="#0a84ff" />
+  <title>Escutar · Mac Audio</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Escutar" />
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <h1>🎧 Escutando o microfone do Mac</h1>
-  <p>Toque no botão para começar a ouvir.</p>
-  <button id="start">▶︎ Escutar</button>
+  <div id="gate"></div>
 
-  <div class="status">
-    <span class="dot" id="dot"></span><span id="state">Parado</span>
-  </div>
-
-  <div class="vol hidden" id="volBox">
-    <label>Volume: <span id="pct">100</span>%</label>
-    <input type="range" id="vol" min="0" max="200" value="100" />
-    <br><button id="mute">🔇 Silenciar</button>
-  </div>
-
-  <div class="conn hidden" id="connBox">
-    <span class="badge" id="qbadge">—</span>
-    <div class="metrics">
-      <div class="metric"><div class="v" id="mRtt">—</div><div class="l">latência (ida+volta)</div></div>
-      <div class="metric"><div class="v" id="mLoss">—</div><div class="l">perda</div></div>
-      <div class="metric"><div class="v" id="mJit">—</div><div class="l">jitter</div></div>
+  <main id="app" class="wrap hidden">
+    <div class="app-head">
+      <div class="logo">🎧</div>
+      <div>
+        <h1>Escutar</h1>
+        <div class="sub">áudio do Mac ao vivo</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Elemento mantido MUDO só para manter o fluxo do WebRTC vivo no iOS.
-       O som audível sai pela Web Audio (GainNode), que permite controlar volume. -->
+    <div class="card">
+      <button class="btn big green" id="start">▶︎ Escutar</button>
+      <button class="btn big red hidden" id="stop">⏹ Parar de escutar</button>
+      <div class="status" style="margin-top:14px">
+        <span class="dot" id="dot"></span>
+        <span id="state">Parado</span>
+        <span class="timer muted" id="timer" style="margin-left:auto"></span>
+      </div>
+      <div class="vu"><i id="vu"></i></div>
+    </div>
+
+    <div class="card hidden" id="volCard">
+      <h2>Volume</h2>
+      <div class="field">
+        <label>Nível <span class="val"><span id="pct">100</span>%</span></label>
+        <input type="range" id="vol" min="0" max="150" value="100" />
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn turbo" id="turbo">🚀 Turbo</button>
+        <button class="btn ghost" id="mute">🔇 Mudo</button>
+      </div>
+      <div class="warn-txt hidden" id="turboWarn">Turbo: volume amplificado com compressor — pode distorcer em som muito alto.</div>
+    </div>
+
+    <div class="card hidden" id="connCard">
+      <h2>Conexão</h2>
+      <div style="text-align:center"><span class="badge" id="qbadge">—</span></div>
+      <div class="metrics">
+        <div class="metric"><div class="v" id="mRtt">—</div><div class="l">latência</div></div>
+        <div class="metric"><div class="v" id="mLoss">—</div><div class="l">perda</div></div>
+        <div class="metric"><div class="v" id="mJit">—</div><div class="l">jitter</div></div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="recCard">
+      <h2>Gravar o que estou ouvindo</h2>
+      <button class="btn ghost" id="record">⏺️ Gravar</button>
+      <div id="recList"></div>
+    </div>
+
+    <div class="hint">Dica: no iPhone, toque em Compartilhar → “Adicionar à Tela de Início” para virar app.</div>
+  </main>
+
+  <!-- keepalive mudo mantém o fluxo WebRTC vivo no iOS -->
   <audio id="keepalive" autoplay playsinline muted></audio>
 
-  <script>
-    let ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-    const TOKEN = new URLSearchParams(location.search).get('token') || '';
-    const Q = TOKEN ? '?token=' + encodeURIComponent(TOKEN) : '';
-    const $ = (id) => document.getElementById(id);
-
-    async function loadIce() {
-      try {
-        const r = await fetch('/ice' + Q);
-        if (r.ok) { const j = await r.json(); if (j.iceServers) ICE = j; }
-      } catch {}
-    }
-    let ws = null, pc = null;
-    let audioCtx = null, gain = null, srcNode = null;
-    let lastVol = 1, muted = false;
-    let statsTimer = null, prevLost = 0, prevRecv = 0, haveBaseline = false;
-
-    function setState(t, on) {
-      $('state').textContent = t;
-      $('dot').classList.toggle('on', !!on);
-    }
-
-    function ensureAudioCtx() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        gain = audioCtx.createGain();
-        gain.gain.value = 1;
-        gain.connect(audioCtx.destination);
-      }
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    function applyVolume() {
-      const pct = muted ? 0 : lastVol;
-      if (gain) gain.gain.value = pct;
-    }
-
-    // ---- Indicador de latência e qualidade -------------------------------
-    function classify(rttMs, lossPct, jitterMs) {
-      // Retorna [rótulo, cor]. Usa o pior dos três fatores.
-      if (rttMs == null) return ['Medindo…', '#888'];
-      if (rttMs < 80 && lossPct < 1 && jitterMs < 15) return ['Excelente', '#30d158'];
-      if (rttMs < 150 && lossPct < 3 && jitterMs < 30) return ['Boa', '#34c759'];
-      if (rttMs < 300 && lossPct < 8 && jitterMs < 60) return ['Instável', '#ff9f0a'];
-      return ['Ruim', '#ff375f'];
-    }
-
-    async function pollStats() {
-      if (!pc) return;
-      let rtt = null, jitter = null, lost = null, recv = null, bestBytes = -1;
-      const stats = await pc.getStats().catch(() => null);
-      if (!stats) return;
-      stats.forEach((r) => {
-        if (r.type === 'inbound-rtp' && (r.kind === 'audio' || r.mediaType === 'audio')) {
-          if (typeof r.jitter === 'number') jitter = r.jitter;      // segundos
-          if (typeof r.packetsLost === 'number') lost = r.packetsLost;
-          if (typeof r.packetsReceived === 'number') recv = r.packetsReceived;
-        }
-        // par de candidatos ICE em uso → RTT de rede
-        if (r.type === 'candidate-pair' && r.state === 'succeeded') {
-          const b = r.bytesReceived || 0;
-          if (b >= bestBytes && typeof r.currentRoundTripTime === 'number') {
-            bestBytes = b; rtt = r.currentRoundTripTime;             // segundos
-          }
-        }
-      });
-
-      // Perda de pacotes no intervalo (delta), não acumulada
-      let lossPct = 0;
-      if (lost != null && recv != null) {
-        const dLost = Math.max(0, lost - prevLost);
-        const dRecv = Math.max(0, recv - prevRecv);
-        prevLost = lost; prevRecv = recv;
-        if (haveBaseline && (dLost + dRecv) > 0) lossPct = (dLost / (dLost + dRecv)) * 100;
-        haveBaseline = true;
-      }
-
-      const rttMs = rtt != null ? Math.round(rtt * 1000) : null;
-      const jitMs = jitter != null ? Math.round(jitter * 1000) : null;
-
-      $('mRtt').textContent = rttMs != null ? rttMs + ' ms' : '—';
-      $('mLoss').textContent = (lost != null) ? lossPct.toFixed(1) + '%' : '—';
-      $('mJit').textContent = jitMs != null ? jitMs + ' ms' : '—';
-
-      const [label, color] = classify(rttMs, lossPct, jitMs == null ? 0 : jitMs);
-      const badge = $('qbadge');
-      badge.textContent = label;
-      badge.style.background = color;
-    }
-
-    function startStats() {
-      $('connBox').classList.remove('hidden');
-      prevLost = 0; prevRecv = 0; haveBaseline = false;
-      if (statsTimer) clearInterval(statsTimer);
-      statsTimer = setInterval(pollStats, 1000);
-    }
-
-    function stopStats() {
-      if (statsTimer) { clearInterval(statsTimer); statsTimer = null; }
-    }
-
-    function connect() {
-      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-      ws = new WebSocket(`${proto}://${location.host}${Q}`);
-      ws.onopen = () => {
-        setState('Conectando…');
-        ws.send(JSON.stringify({ type: 'listener' }));
-      };
-      ws.onmessage = async (e) => {
-        const msg = JSON.parse(e.data);
-        if (msg.type === 'offer') await onOffer(msg.sdp);
-        else if (msg.type === 'candidate' && pc && msg.candidate) {
-          await pc.addIceCandidate(msg.candidate).catch(()=>{});
-        } else if (msg.type === 'no-broadcaster') {
-          setState('O Mac ainda não está transmitindo. Abra /broadcast no Mac.');
-        } else if (msg.type === 'broadcaster-left') {
-          setState('Transmissor saiu.');
-        }
-      };
-      ws.onclose = () => { setState('Desconectado — toque em Escutar de novo'); stopStats(); };
-    }
-
-    async function onOffer(sdp) {
-      pc = new RTCPeerConnection(ICE);
-      pc.onicecandidate = (ev) => {
-        if (ev.candidate) ws.send(JSON.stringify({ type: 'candidate', candidate: ev.candidate }));
-      };
-      pc.ontrack = (ev) => {
-        const stream = ev.streams[0];
-        // Keepalive mudo (iOS): mantém a track "viva"
-        $('keepalive').srcObject = stream;
-        $('keepalive').play().catch(()=>{});
-        // Som real via Web Audio, com controle de volume
-        ensureAudioCtx();
-        if (srcNode) { try { srcNode.disconnect(); } catch {} }
-        srcNode = audioCtx.createMediaStreamSource(stream);
-        srcNode.connect(gain);
-        applyVolume();
-        $('volBox').classList.remove('hidden');
-        setState('Ao vivo ✅', true);
-        startStats();
-      };
-      pc.onconnectionstatechange = () => {
-        if (['disconnected','failed','closed'].includes(pc.connectionState)) {
-          setState('Conexão perdida — toque em Escutar de novo');
-          stopStats();
-        }
-      };
-      await pc.setRemoteDescription(sdp);
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      ws.send(JSON.stringify({ type: 'answer', sdp: pc.localDescription }));
-    }
-
-    $('vol').oninput = (e) => {
-      lastVol = e.target.value / 100;
-      $('pct').textContent = e.target.value;
-      if (lastVol > 0 && muted) { muted = false; $('mute').textContent = '🔇 Silenciar'; }
-      applyVolume();
-    };
-
-    $('mute').onclick = () => {
-      muted = !muted;
-      $('mute').textContent = muted ? '🔊 Ativar som' : '🔇 Silenciar';
-      applyVolume();
-    };
-
-    $('start').onclick = async () => {
-      // Gesto do usuário: destrava o áudio e o AudioContext no iOS
-      ensureAudioCtx();
-      $('keepalive').play().catch(()=>{});
-      $('start').disabled = true;
-      await loadIce();                     // carrega STUN/TURN antes de conectar
-      connect();
-    };
-  </script>
+  <script src="/common.js"></script>
+  <script src="/listen.js"></script>
 </body>
 </html>

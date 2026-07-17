@@ -51,6 +51,34 @@ function tokenOk(token) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
+// ---- Anti-força-bruta (senha ficou curta): limite por IP -------------------
+const fails = new Map();               // ip -> { n, until }
+const MAX_FAILS = 12, BLOCK_MS = 60000, WINDOW_MS = 60000;
+function clientIp(req) {
+  return (req.headers && (req.headers['cf-connecting-ip'] ||
+    (req.headers['x-forwarded-for'] || '').split(',')[0].trim())) ||
+    (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+function isBlocked(ip) {
+  const f = fails.get(ip);
+  return f && f.until > Date.now();
+}
+function recordFail(ip) {
+  const now = Date.now();
+  const f = fails.get(ip) || { n: 0, until: 0 };
+  if (now - (f.ts || 0) > WINDOW_MS) f.n = 0;
+  f.n++; f.ts = now;
+  if (f.n >= MAX_FAILS) { f.until = now + BLOCK_MS; f.n = 0; }
+  fails.set(ip, f);
+}
+function clearFail(ip) { fails.delete(ip); }
+// Retorna 'ok' | 'bad' | 'blocked'
+function authCheck(token, ip) {
+  if (isBlocked(ip)) return 'blocked';
+  if (tokenOk(token)) { clearFail(ip); return 'ok'; }
+  recordFail(ip); return 'bad';
+}
+
 // ---- Credenciais TURN temporárias (padrão TURN REST / coturn use-auth-secret)
 function turnCredentials() {
   const expiry = Math.floor(Date.now() / 1000) + TURN_TTL;
@@ -76,9 +104,12 @@ function iceServers() {
   return list;
 }
 
-// Entrega a configuração ICE (STUN + TURN) para os clientes
+// Entrega a configuração ICE (STUN + TURN) para os clientes.
+// Também é o endpoint que a tela de login usa para validar a senha.
 app.get('/ice', (req, res) => {
-  if (!tokenOk(req.query.token)) return res.status(401).json({ error: 'token inválido' });
+  const r = authCheck(req.query.token, clientIp(req));
+  if (r === 'blocked') return res.status(429).json({ error: 'muitas tentativas, tente em 1 min' });
+  if (r === 'bad') return res.status(401).json({ error: 'token inválido' });
   res.json({ iceServers: iceServers() });
 });
 
@@ -103,14 +134,17 @@ function send(ws, msg) {
 }
 
 function handleConnection(ws, req) {
-  // Rejeita quem não apresentar o token correto (quando há token configurado)
-  if (!tokenOk(tokenFrom(req && req.url))) {
-    try { ws.close(4001, 'token inválido'); } catch {}
+  // Rejeita quem não apresentar a senha correta (ou estiver bloqueado)
+  const r = authCheck(tokenFrom(req && req.url), clientIp(req));
+  if (r !== 'ok') {
+    try { ws.close(r === 'blocked' ? 4029 : 4001, r); } catch {}
     return;
   }
 
   ws.role = null;
   ws.id = null;
+  ws.isAlive = true;
+  ws.on('pong', () => { ws.isAlive = true; });
 
   ws.on('message', (data) => {
     let msg;
@@ -164,12 +198,26 @@ function handleConnection(ws, req) {
   });
 }
 
+// Heartbeat: ping periódico mantém o WebSocket vivo através do Cloudflare Tunnel
+// (que fecha conexões ociosas) e derruba sockets mortos.
+function startHeartbeat(wss) {
+  setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if (ws.isAlive === false) { try { ws.terminate(); } catch {} return; }
+      ws.isAlive = false;
+      try { ws.ping(); } catch {}
+    });
+  }, 30000);
+}
+
 // ===========================================================================
 // MODO PROXY (homelab / CloudPanel): só HTTP interno; SSL fica no Nginx
 // ===========================================================================
 if (PROXY) {
   const server = http.createServer(app);
-  new WebSocketServer({ server }).on('connection', handleConnection);
+  const wss = new WebSocketServer({ server });
+  wss.on('connection', handleConnection);
+  startHeartbeat(wss);
   server.listen(PORT, () => {
     console.log('\n=============================================');
     console.log('  Mac Audio (modo PROXY / homelab)  ✅ no ar');
@@ -190,11 +238,15 @@ if (PROXY) {
 // ===========================================================================
 } else {
   const httpServer = http.createServer(app);
-  new WebSocketServer({ server: httpServer }).on('connection', handleConnection);
+  const wssHttp = new WebSocketServer({ server: httpServer });
+  wssHttp.on('connection', handleConnection);
+  startHeartbeat(wssHttp);
 
   const { key, cert, source } = getCredentials();
   const httpsServer = https.createServer({ key, cert }, app);
-  new WebSocketServer({ server: httpsServer }).on('connection', handleConnection);
+  const wssHttps = new WebSocketServer({ server: httpsServer });
+  wssHttps.on('connection', handleConnection);
+  startHeartbeat(wssHttps);
 
   httpServer.listen(PORT, () => {
     httpsServer.listen(HTTPS_PORT, () => {
