@@ -1,25 +1,25 @@
 /* Mac Audio — ouvinte (iPhone) */
-const { $, toast, Prefs, gate, loadIce, getIce, authQuery, buildBoostChain, attachVU,
+const { $, toast, Prefs, gate, loadIce, getIce, authQuery, buildBoostChain,
         acquireWake, releaseWake, fmtDur, registerSW } = MA;
 
 registerSW();
 
 let ws = null, pc = null;
-let audioCtx = null, boost = null, srcNode = null, recDest = null, vu = null;
+let audioCtx = null, boost = null, outGain = null, analyser = null, srcNode = null;
+let receivedStream = null;
 let listening = false, manualStop = false, backoff = 1000;
 let statsTimer = null, timerTimer = null, startedAt = 0;
 let prevLost = 0, prevRecv = 0, haveBaseline = false;
 let volPct = Prefs.get('vol', 100), turbo = Prefs.get('turbo', false), muted = false;
+let bgMode = Prefs.get('bg', false);
 let recorder = null, recChunks = [], recStartAt = 0;
 
 gate(init);
 
 function init() {
-  // restaura preferências na UI
-  $('vol').max = turbo ? 500 : 150;
+  applySliderMax();
   $('vol').value = volPct; $('pct').textContent = volPct;
-  setTurboUI();
-
+  setTurboUI(); setBgUI();
   $('start').onclick = start;
   $('stop').onclick = stop;
   $('vol').oninput = (e) => {
@@ -28,51 +28,98 @@ function init() {
     applyGain();
   };
   $('turbo').onclick = toggleTurbo;
-  $('mute').onclick = () => {
-    muted = !muted; $('mute').textContent = muted ? '🔊 Som' : '🔇 Mudo'; applyGain();
-  };
+  $('mute').onclick = () => { muted = !muted; $('mute').textContent = muted ? '🔊 Som' : '🔇 Mudo'; applyGain(); };
+  $('bg').onclick = toggleBg;
   $('record').onclick = toggleRecording;
 }
 
-function setState(t, cls) {
-  $('state').textContent = t;
-  const d = $('dot'); d.className = 'dot' + (cls ? ' ' + cls : '');
-}
+function setState(t, cls) { $('state').textContent = t; $('dot').className = 'dot' + (cls ? ' ' + cls : ''); }
+function applySliderMax() { $('vol').max = bgMode ? 100 : (turbo ? 500 : 150); }
 
 function ensureAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     boost = buildBoostChain(audioCtx);
-    boost.output.connect(audioCtx.destination);
-    recDest = audioCtx.createMediaStreamDestination();
-    boost.output.connect(recDest);
-    vu = attachVU(audioCtx, boost.output, (lv) => { $('vu').style.width = (lv * 100).toFixed(0) + '%'; });
+    outGain = audioCtx.createGain(); outGain.gain.value = 1;
+    boost.output.connect(outGain); outGain.connect(audioCtx.destination);
+    analyser = audioCtx.createAnalyser(); analyser.fftSize = 512;
+    const buf = new Uint8Array(analyser.frequencyBinCount);
+    (function loop() {
+      analyser.getByteTimeDomainData(buf);
+      let s = 0; for (const v of buf) { const x = (v - 128) / 128; s += x * x; }
+      $('vu').style.width = (Math.min(1, Math.sqrt(s / buf.length) * 3) * 100).toFixed(0) + '%';
+      requestAnimationFrame(loop);
+    })();
     boost.setBoost(turbo);
-    applyGain();
   }
   if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
-function applyGain() { if (boost) boost.setGain(muted ? 0 : volPct / 100); }
-
-function setTurboUI() {
-  $('turbo').classList.toggle('on', turbo);
-  $('turbo').textContent = turbo ? '🚀 Turbo ON' : '🚀 Turbo';
-  $('turboWarn').classList.toggle('hidden', !turbo);
+// Modo: Boost (Web Audio, app aberto) x Segundo plano (player de mídia, toca bloqueado)
+function applyMode() {
+  const p = $('player');
+  if (bgMode) {
+    if (outGain) outGain.gain.value = 0;        // silencia o caminho Web Audio
+    p.muted = false; p.volume = Math.min(1, muted ? 0 : volPct / 100);
+    p.play().catch(() => {});
+    setMediaSession();
+  } else {
+    if (outGain) outGain.gain.value = 1;         // som pela Web Audio (com boost)
+    p.muted = true;
+    applyGain();
+  }
+  $('turbo').disabled = bgMode; $('turbo').style.opacity = bgMode ? .5 : 1;
 }
+
+function applyGain() {
+  if (bgMode) { $('player').volume = Math.min(1, muted ? 0 : volPct / 100); }
+  else if (boost) boost.setGain(muted ? 0 : volPct / 100);
+}
+
+function setTurboUI() { $('turbo').classList.toggle('on', turbo); $('turbo').textContent = turbo ? '🚀 Turbo ON' : '🚀 Turbo'; $('turboWarn').classList.toggle('hidden', !turbo || bgMode); }
 function toggleTurbo() {
-  turbo = !turbo; Prefs.set('turbo', turbo);
-  $('vol').max = turbo ? 500 : 150;
+  if (bgMode) { toast('Turbo indisponível no modo segundo plano (use o Turbo do Mac)'); return; }
+  turbo = !turbo; Prefs.set('turbo', turbo); applySliderMax();
   if (!turbo && volPct > 150) { volPct = 150; $('vol').value = 150; $('pct').textContent = 150; Prefs.set('vol', 150); }
   if (boost) boost.setBoost(turbo);
   setTurboUI(); applyGain();
 }
 
-// ---------- Ciclo escutar / parar ----------
+function setBgUI() {
+  $('bg').classList.toggle('on', bgMode);
+  $('bg').textContent = bgMode ? '🔒 Segundo plano: LIGADO' : '🔒 Segundo plano: desligado';
+  $('bgHint').style.display = bgMode ? 'block' : 'none';
+  setTurboUI();
+}
+function toggleBg() {
+  bgMode = !bgMode; Prefs.set('bg', bgMode);
+  applySliderMax();
+  if (bgMode && volPct > 100) { volPct = 100; $('vol').value = 100; $('pct').textContent = 100; Prefs.set('vol', 100); }
+  setBgUI();
+  if (audioCtx) applyMode();
+  toast(bgMode ? 'Segundo plano ligado' : 'Modo boost (app aberto)');
+}
+
+function setMediaSession() {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: 'Mac Audio — ao vivo', artist: 'Transmissão do Mac',
+      artwork: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+                { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' }],
+    });
+    navigator.mediaSession.playbackState = 'playing';
+    navigator.mediaSession.setActionHandler('play', () => $('player').play().catch(() => {}));
+    navigator.mediaSession.setActionHandler('pause', () => $('player').pause());
+    navigator.mediaSession.setActionHandler('stop', () => stop());
+  } catch {}
+}
+
+// ---------- Escutar / parar ----------
 async function start() {
   manualStop = false; listening = true;
   ensureAudio();
-  $('keepalive').play().catch(() => {});
+  $('player').play().catch(() => {});   // inicia (mudo) dentro do gesto → destrava iOS
   $('start').classList.add('hidden'); $('stop').classList.remove('hidden');
   $('volCard').classList.remove('hidden'); $('recCard').classList.remove('hidden');
   acquireWake();
@@ -87,6 +134,8 @@ function stop() {
   closePc();
   stopStats(); stopTimer(); releaseWake();
   if (recorder && recorder.state === 'recording') stopRecording();
+  const p = $('player'); try { p.pause(); } catch {} p.srcObject = null; p.muted = true;
+  if ('mediaSession' in navigator) { try { navigator.mediaSession.playbackState = 'none'; } catch {} }
   $('vu').style.width = '0%';
   $('stop').classList.add('hidden'); $('start').classList.remove('hidden');
   $('connCard').classList.add('hidden');
@@ -123,13 +172,14 @@ async function onOffer(sdp) {
   pc = new RTCPeerConnection(getIce());
   pc.onicecandidate = (ev) => { if (ev.candidate && ws) ws.send(JSON.stringify({ type: 'candidate', candidate: ev.candidate })); };
   pc.ontrack = (ev) => {
-    const stream = ev.streams[0];
-    $('keepalive').srcObject = stream; $('keepalive').play().catch(() => {});
+    receivedStream = ev.streams[0];
+    $('player').srcObject = receivedStream;
     ensureAudio();
     if (srcNode) { try { srcNode.disconnect(); } catch {} }
-    srcNode = audioCtx.createMediaStreamSource(stream);
+    srcNode = audioCtx.createMediaStreamSource(receivedStream);
+    srcNode.connect(analyser);
     srcNode.connect(boost.input);
-    applyGain();
+    applyMode();
     setState('Ao vivo', 'on');
     startStats();
   };
@@ -148,7 +198,7 @@ async function onOffer(sdp) {
 function startTimer() { startedAt = Date.now(); timerTimer = setInterval(() => { $('timer').textContent = fmtDur(Date.now() - startedAt); }, 1000); }
 function stopTimer() { clearInterval(timerTimer); timerTimer = null; $('timer').textContent = ''; }
 
-// ---------- Qualidade da conexão ----------
+// ---------- Qualidade ----------
 function classify(rttMs, lossPct, jitMs) {
   if (rttMs == null) return ['Medindo…', '#8e8e93'];
   if (rttMs < 80 && lossPct < 1 && jitMs < 15) return ['Excelente', '#30d158'];
@@ -189,31 +239,20 @@ async function pollStats() {
 function startStats() { $('connCard').classList.remove('hidden'); prevLost = 0; prevRecv = 0; haveBaseline = false; clearInterval(statsTimer); statsTimer = setInterval(pollStats, 1000); }
 function stopStats() { clearInterval(statsTimer); statsTimer = null; }
 
-// ---------- Gravar o que ouço ----------
-function pickMime() {
-  const opts = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/aac'];
-  if (window.MediaRecorder && MediaRecorder.isTypeSupported) for (const t of opts) if (MediaRecorder.isTypeSupported(t)) return t;
-  return '';
-}
+// ---------- Gravar o que ouço (grava o stream recebido — funciona nos dois modos) ----------
+function pickMime() { const opts = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/aac']; if (window.MediaRecorder && MediaRecorder.isTypeSupported) for (const t of opts) if (MediaRecorder.isTypeSupported(t)) return t; return ''; }
 function toggleRecording() { if (recorder && recorder.state === 'recording') stopRecording(); else startRecording(); }
 function startRecording() {
-  if (!recDest) { toast('Comece a escutar primeiro'); return; }
+  if (!receivedStream) { toast('Comece a escutar primeiro'); return; }
   const mime = pickMime();
-  try { recorder = new MediaRecorder(recDest.stream, mime ? { mimeType: mime } : undefined); }
-  catch (e) { toast('Gravação não suportada'); return; }
-  recChunks = [];
-  recorder.ondataavailable = (e) => { if (e.data && e.data.size) recChunks.push(e.data); };
-  recorder.onstop = () => finalizeRecording(recorder.mimeType || mime);
-  recorder.start(); recStartAt = Date.now();
+  try { recorder = new MediaRecorder(receivedStream, mime ? { mimeType: mime } : undefined); } catch (e) { toast('Gravação não suportada'); return; }
+  recChunks = []; recorder.ondataavailable = (e) => { if (e.data && e.data.size) recChunks.push(e.data); };
+  recorder.onstop = () => finalizeRecording(recorder.mimeType || mime); recorder.start(); recStartAt = Date.now();
   $('record').classList.add('red'); $('record').innerHTML = '<span class="rec-dot"></span> Parar gravação';
 }
-function stopRecording() {
-  if (recorder && recorder.state !== 'inactive') recorder.stop();
-  recorder = null; $('record').classList.remove('red'); $('record').textContent = '⏺️ Gravar';
-}
+function stopRecording() { if (recorder && recorder.state !== 'inactive') recorder.stop(); recorder = null; $('record').classList.remove('red'); $('record').textContent = '⏺️ Gravar'; }
 function finalizeRecording(mime) {
-  const type = (mime || '').split(';')[0] || 'audio/webm';
-  const ext = type.includes('mp4') || type.includes('aac') ? 'm4a' : 'webm';
+  const type = (mime || '').split(';')[0] || 'audio/webm'; const ext = type.includes('mp4') || type.includes('aac') ? 'm4a' : 'webm';
   const blob = new Blob(recChunks, { type }); const url = URL.createObjectURL(blob);
   const dur = fmtDur(Date.now() - recStartAt); const size = (blob.size / 1048576).toFixed(2);
   const stamp = new Date().toLocaleString('pt-BR').replace(/[/:]/g, '-').replace(', ', '_');

@@ -47,7 +47,9 @@
         <button class="btn turbo" id="turbo">🚀 Turbo</button>
         <button class="btn ghost" id="mute">🔇 Mudo</button>
       </div>
+      <button class="btn ghost" id="bg" style="margin-top:10px">🔒 Segundo plano: desligado</button>
       <div class="warn-txt hidden" id="turboWarn">Turbo: volume amplificado com compressor — pode distorcer em som muito alto.</div>
+      <div class="hint" id="bgHint" style="text-align:left; display:none">Segundo plano ligado: continua tocando com a tela bloqueada. O volume forte é feito no Mac (Turbo de entrada); o Turbo daqui fica desativado.</div>
     </div>
 
     <div class="card hidden" id="connCard">
@@ -69,8 +71,8 @@
     <div class="hint">Dica: no iPhone, toque em Compartilhar → “Adicionar à Tela de Início” para virar app.</div>
   </main>
 
-  <!-- keepalive mudo mantém o fluxo WebRTC vivo no iOS -->
-  <audio id="keepalive" autoplay playsinline muted></audio>
+  <!-- Player de mídia: mudo no modo Boost (keepalive iOS); com som no modo Segundo plano -->
+  <audio id="player" autoplay playsinline muted></audio>
 
   <script src="/common.js"></script>
   <script src="/listen.js"></script>

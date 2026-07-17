@@ -1,5 +1,5 @@
 /* Mac Audio — service worker (app shell offline; network-first) */
-const CACHE = 'ma-v2';
+const CACHE = 'ma-v3';
 const ASSETS = [
   '/', '/listen', '/broadcast', '/style.css', '/common.js',
   '/listen.js', '/broadcast.js', '/manifest.webmanifest',
