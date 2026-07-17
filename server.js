@@ -122,7 +122,13 @@ app.get('/rootCA.pem', (req, res) => {
   res.sendFile(p);
 });
 
-app.use(express.static('public', { extensions: ['html'] }));
+// no-cache: o navegador revalida (via ETag) a cada carga, então pega a versão
+// nova assim que muda — evita ficar preso em HTML/JS/CSS antigo entre deploys.
+app.use(express.static('public', {
+  extensions: ['html'],
+  etag: true,
+  setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache'),
+}));
 
 // ---- Estado compartilhado da ponte ----------------------------------------
 let broadcaster = null;            // o Mac que captura o microfone
