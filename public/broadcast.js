@@ -8,7 +8,8 @@ let ws = null;
 const peers = new Map();               // id -> RTCPeerConnection
 let audioCtx = null, boost = null, sendGain = null, outDest = null, micSource = null;
 let localStream = null, sentTrack = null;
-let transmitting = false, manualStop = false, paused = false, backoff = 1000;
+let transmitting = false, manualStop = false, paused = false, backoff = 1000, recovering = false;
+let lastTick = Date.now();
 let inGainPct = Prefs.get('in', 100), turbo = Prefs.get('inturbo', false);
 let quality = Prefs.get('quality', 'voice');
 let recorder = null, recChunks = [], recStartAt = 0;
@@ -61,12 +62,56 @@ function connectMic(stream) {
   micSource.connect(boost.input);
 }
 
+// ---- Auto-recuperação do microfone (ex.: Mac cochila ao fechar/abrir a tampa) ----
+function watchMicTrack() {
+  const tr = localStream && localStream.getAudioTracks()[0];
+  if (!tr) return;
+  tr.onended = () => { if (transmitting) { setState('Recuperando microfone…', 'warn'); recoverMic(); } };
+  tr.onmute = () => { if (transmitting && !paused) setState('Mic interrompido pelo sistema…', 'warn'); };
+  tr.onunmute = () => { if (transmitting) applyPause(); };
+}
+async function recoverMic() {
+  if (!transmitting || recovering) return;
+  recovering = true;
+  try {
+    const deviceId = $('mic').value;
+    const audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+    if (deviceId) audio.deviceId = { exact: deviceId };
+    const s = await navigator.mediaDevices.getUserMedia({ audio, video: false });
+    if (localStream) localStream.getTracks().forEach((t) => t.stop());
+    localStream = s; connectMic(s); watchMicTrack();
+    if (audioCtx && audioCtx.state !== 'running') { try { await audioCtx.resume(); } catch {} }
+    applyPause();                       // restaura estado (Transmitindo/Pausado)
+    toast('Microfone recuperado');
+  } catch (e) {
+    setState('Sem microfone — tentando de novo…', 'err');
+    recovering = false;
+    setTimeout(recoverMic, 2500);
+    return;
+  }
+  recovering = false;
+}
+// Vigia sleep/wake (lacuna no relógio) e faixa morta → recupera; e resume o AudioContext
+setInterval(() => {
+  if (!transmitting) { lastTick = Date.now(); return; }
+  lastTick = Date.now();
+  if (audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
+  const tr = localStream && localStream.getAudioTracks()[0];
+  if (!tr || tr.readyState === 'ended') recoverMic();
+}, 2000);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !transmitting) return;
+  if (audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
+  const tr = localStream && localStream.getAudioTracks()[0];
+  if (!tr || tr.readyState === 'ended') recoverMic();
+});
+
 // ---------- Início / parada ----------
 async function start() {
   try { localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }, video: false }); }
   catch (err) { toast('Sem acesso ao microfone: ' + err.message); return; }
   manualStop = false; transmitting = true; paused = false;
-  ensureGraph(); connectMic(localStream); audioCtx.resume();
+  ensureGraph(); connectMic(localStream); watchMicTrack(); audioCtx.resume();
   $('start').classList.add('hidden');
   ['statusRow', 'vuWrap', 'ctrlRow', 'micCard', 'qualCard', 'shareCard', 'listenersCard', 'recCard'].forEach((id) => $(id).classList.remove('hidden'));
   setState('Transmitindo', 'on');
@@ -140,7 +185,7 @@ async function switchMic(deviceId) {
   try { s = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: { exact: deviceId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }, video: false }); }
   catch (err) { toast('Falha ao trocar mic: ' + err.message); return; }
   if (localStream) localStream.getTracks().forEach((t) => t.stop());
-  localStream = s; connectMic(s);            // faixa enviada (outDest) não muda → sem renegociação
+  localStream = s; connectMic(s); watchMicTrack();   // faixa enviada (outDest) não muda → sem renegociação
   toast('Microfone trocado');
 }
 
